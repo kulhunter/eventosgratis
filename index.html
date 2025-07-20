@@ -6,7 +6,7 @@
     <title>Eventis | Tu Agenda de Eventos Gratuitos en Chile</title>
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Encuentra los mejores panoramas y eventos gratuitos en todo Chile. Conciertos, arte, teatro, cine y más, actualizados automáticamente cada hora.">
+    <meta name="description" content="Encuentra los mejores panoramas y eventos gratuitos en todo Chile. Conciertos, arte, teatro, cine y más, actualizados en vivo desde las mejores fuentes.">
     <meta name="keywords" content="eventos gratis, panoramas, chile, santiago, valparaíso, concepción, conciertos, cultura, gratis, agenda cultural">
     <meta name="author" content="Eventis">
 
@@ -27,18 +27,6 @@
         .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
         .tag { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        .bot-fab { position: fixed; bottom: 2rem; right: 2rem; z-index: 40; }
-        .bot-modal {
-            position: fixed; bottom: 6.5rem; right: 2rem; width: 350px; height: 450px;
-            border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            transform: scale(0.5); transform-origin: bottom right; opacity: 0;
-            transition: transform 0.3s ease, opacity 0.3s ease; z-index: 40;
-            display: flex; flex-direction: column;
-        }
-        .bot-modal.visible { transform: scale(1); opacity: 1; }
-        .chat-bubble { max-width: 85%; padding: 0.75rem 1rem; border-radius: 1rem; line-height: 1.4; }
-        .chat-bubble.bot { background-color: #e5e7eb; align-self: flex-start; border-bottom-left-radius: 0.25rem; }
-        .chat-bubble.user { background-color: #4f46e5; color: white; align-self: flex-end; border-bottom-right-radius: 0.25rem; }
     </style>
 
     <!-- JSON-LD Structured Data for SEO -->
@@ -62,7 +50,7 @@
     <header class="hero-gradient text-white py-12 sm:py-20">
         <div class="container mx-auto px-6 text-center">
             <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">Descubre Eventos Increíbles ✨</h1>
-            <p class="mt-4 text-lg sm:text-xl text-indigo-200 max-w-3xl mx-auto">Tu portal para encontrar panoramas gratuitos en todo Chile. La cultura te espera, ¡sal a buscarla!</p>
+            <p class="mt-4 text-lg sm:text-xl text-indigo-200 max-w-3xl mx-auto">Tu portal para encontrar panoramas gratuitos en todo Chile, actualizado en vivo.</p>
         </div>
     </header>
 
@@ -74,8 +62,7 @@
                 <select id="city-filter" class="border-gray-200 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
                     <option value="">Todas</option>
                     <option value="Santiago">Santiago</option>
-                    <option value="Valparaíso">Valparaíso</option>
-                    <option value="Concepción">Concepción</option>
+                    <option value="Nacional">Nacional</option>
                 </select>
             </div>
             <div class="flex items-center gap-2">
@@ -88,6 +75,7 @@
                     <option value="Teatro">Teatro 🎭</option>
                     <option value="Familia">Familia 👨‍👩‍👧‍👦</option>
                     <option value="Aire Libre">Aire Libre 🌳</option>
+                    <option value="Cultura">Cultura 🏛️</option>
                 </select>
             </div>
             <div class="flex items-center gap-2">
@@ -104,53 +92,35 @@
         <!-- Loading / Empty State -->
         <div id="loading-indicator" class="text-center py-12">
             <i class="fas fa-spinner fa-spin text-4xl text-indigo-500"></i>
-            <p class="text-lg text-gray-600 mt-4">Buscando los mejores panoramas...</p>
+            <p class="text-lg text-gray-600 mt-4">Buscando eventos gratuitos con imagen en vivo...</p>
         </div>
         <div id="no-events-message" class="hidden text-center py-16 px-6 bg-white rounded-xl shadow-lg">
             <img src="https://placehold.co/128x128/e0e7ff/6366f1?text=🤔" alt="Ícono de búsqueda" class="mx-auto rounded-full">
-            <p class="text-2xl font-bold text-gray-800 mt-6">¡Ups! No encontramos eventos</p>
-            <p class="text-gray-500 mt-2 max-w-md mx-auto">Prueba con otros filtros o vuelve más tarde. Nuestro robot busca nuevos eventos cada hora. ¡Seguro pronto aparecerá algo para ti!</p>
-        </div>
-    </div>
-
-    <!-- AI Assistant FAB -->
-    <div class="bot-fab">
-        <button id="bot-toggle-button" class="bg-indigo-600 text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center text-2xl hover:bg-indigo-700 transition-all duration-300 transform hover:scale-110 hover:rotate-12">
-            <i class="fa-solid fa-robot"></i>
-        </button>
-    </div>
-    <div id="bot-modal" class="bot-modal bg-white overflow-hidden">
-        <div class="bg-indigo-600 text-white p-4 text-center font-bold shadow-md">Asesor de Eventos IA</div>
-        <div id="chat-window" class="flex-grow p-4 flex flex-col gap-3 overflow-y-auto"></div>
-        <div id="bot-actions" class="p-3 border-t border-gray-200 bg-gray-50">
-            <button id="suggest-event-button" class="w-full bg-indigo-500 text-white px-4 py-2.5 rounded-lg hover:bg-indigo-600 transition-colors text-sm font-semibold flex items-center justify-center gap-2">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                <span>Sorpréndeme para hoy</span>
-            </button>
+            <p class="text-2xl font-bold text-gray-800 mt-6">¡Ups! No encontramos eventos gratuitos con imagen</p>
+            <p class="text-gray-500 mt-2 max-w-md mx-auto">Prueba con otros filtros o recarga la página. Los filtros de calidad son muy estrictos.</p>
         </div>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyCaErRFWD_Z9UgE0bBoblY-H9_zKh-vSII",
-            authDomain: "appeventos-de195.firebaseapp.com",
-            projectId: "appeventos-de195",
-            storageBucket: "appeventos-de195.firebasestorage.app",
-            messagingSenderId: "176519875945",
-            appId: "1:176519875945:web:aa5d3e2e14f3231e8ac1f8",
-            measurementId: "G-WJRS95EX7B"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        const appId = firebaseConfig.projectId;
+        // --- CONFIGURACIÓN ---
         let allEvents = [];
+        // Se usa un proxy para evitar errores de seguridad (CORS) que bloquean las peticiones
+        // desde una web de GitHub a otros sitios.
+        const CORS_PROXY = "https://api.allorigins.win/raw?url=";
+        
+        // Lista de fuentes RSS curadas. Son las más fiables y rápidas para un sistema sin backend.
+        const sources = [
+            { name: "El Mostrador Cultura", url: "https://www.elmostrador.cl/cultura/feed/", city: "Nacional" },
+            { name: "ChileCultura", url: "https://chilecultura.gob.cl/agendacultural/feed", city: "Nacional" },
+            { name: "El Dínamo Cultura", url: "https://www.eldinamo.cl/cultura/feed/", city: "Nacional" },
+            { name: "Agenda Chilena", url: "https://www.agendachilena.cl/feed/", city: "Nacional" },
+            { name: "Parlante.cl", url: "https://parlante.cl/feed/", city: "Nacional" },
+            { name: "BioBioChile Cultura", url: "https://www.biobiochile.cl/lista/categorias/cultura/feed", city: "Nacional" },
+            { name: "Pousta", url: "https://www.pousta.com/feed/", city: "Nacional" },
+            { name: "Zancada", url: "https://www.zancada.cl/feed/", city: "Nacional" },
+        ];
 
+        // --- REFERENCIAS AL DOM ---
         const eventsContainer = document.getElementById('events-container');
         const loadingIndicator = document.getElementById('loading-indicator');
         const noEventsMessage = document.getElementById('no-events-message');
@@ -165,15 +135,102 @@
             'Cultura': 'bg-gray-100 text-gray-800'
         };
 
-        const applyFilters = () => {
+        // --- LÓGICA DE FILTRADO Y EXTRACCIÓN ---
+
+        function inferCategory(text) {
+            const lowerText = text.toLowerCase();
+            if (lowerText.includes('música') || lowerText.includes('concierto') || lowerText.includes('banda')) return 'Música';
+            if (lowerText.includes('arte') || lowerText.includes('exposición') || lowerText.includes('galería')) return 'Arte';
+            if (lowerText.includes('cine') || lowerText.includes('película') || lowerText.includes('documental')) return 'Cine';
+            if (lowerText.includes('teatro') || lowerText.includes('obra') || lowerText.includes('danza')) return 'Teatro';
+            if (lowerText.includes('niños') || lowerText.includes('familia') || lowerText.includes('taller')) return 'Familia';
+            if (lowerText.includes('parque') || lowerText.includes('aire libre') || lowerText.includes('feria')) return 'Aire Libre';
+            return 'Cultura';
+        }
+
+        function isEventFree(text) {
+            const lowerText = text.toLowerCase();
+            const freeKeywords = ['gratis', 'gratuito', 'entrada liberada', 'sin costo', 'acceso gratuito', 'acceso liberado'];
+            return freeKeywords.some(keyword => lowerText.includes(keyword));
+        }
+        
+        function extractLocation(text) {
+            const lowerText = text.toLowerCase();
+            const knownLocations = {
+                "gam": "Centro GAM", "centro gam": "Centro GAM",
+                "centro cultural la moneda": "CC La Moneda", "cclm": "CC La Moneda",
+                "matucana 100": "Matucana 100", "m100": "Matucana 100",
+                "museo de bellas artes": "Museo Nacional de Bellas Artes", "mnba": "Museo Nacional de Bellas Artes",
+                "biblioteca de santiago": "Biblioteca de Santiago"
+            };
+            for (const key in knownLocations) {
+                if (lowerText.includes(key)) {
+                    return knownLocations[key];
+                }
+            }
+            return "Revisar en el sitio web";
+        }
+
+        async function fetchAndParseRSS(source) {
+            try {
+                const response = await fetch(`${CORS_PROXY}${encodeURIComponent(source.url)}`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const text = await response.text();
+                
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(text, "application/xml");
+                const items = xml.querySelectorAll("item");
+                
+                items.forEach(item => {
+                    const title = item.querySelector("title")?.textContent || '';
+                    const link = item.querySelector("link")?.textContent || '';
+                    const description = item.querySelector("description")?.textContent.replace(/<[^>]*>?/gm, '') || '';
+                    const fullText = title + ' ' + description;
+                    
+                    // --- FILTROS DE CALIDAD ---
+                    if (!isEventFree(fullText)) {
+                        return; // DESCARTADO: No es explícitamente gratuito
+                    }
+
+                    const contentEncoded = item.querySelector("content\\:encoded")?.textContent || '';
+                    let imageUrl = null;
+                    if (contentEncoded) {
+                        const doc = parser.parseFromString(contentEncoded, 'text/html');
+                        imageUrl = doc.querySelector('img')?.src;
+                    }
+                    
+                    if (!imageUrl) {
+                        return; // DESCARTADO: No tiene imagen
+                    }
+
+                    if (title && link) {
+                        const pubDate = item.querySelector("pubDate")?.textContent || new Date().toISOString();
+                        allEvents.push({
+                            name: title,
+                            description: description.substring(0, 150) + '...',
+                            imageUrl: imageUrl,
+                            sourceUrl: link,
+                            city: source.city,
+                            location: extractLocation(fullText),
+                            category: inferCategory(fullText),
+                            date: new Date(pubDate).toISOString().slice(0, 10)
+                        });
+                    }
+                });
+            } catch (error) {
+                console.error(`Error fetching source ${source.name}:`, error);
+            }
+        }
+
+        function applyFilters() {
             let filteredEvents = allEvents;
             if (cityFilter.value) filteredEvents = filteredEvents.filter(e => e.city === cityFilter.value);
             if (categoryFilter.value) filteredEvents = filteredEvents.filter(e => e.category === categoryFilter.value);
             if (dateFilter.value) filteredEvents = filteredEvents.filter(e => e.date === dateFilter.value);
             renderEvents(filteredEvents);
-        };
+        }
 
-        const renderEvents = (eventsToRender) => {
+        function renderEvents(eventsToRender) {
             eventsContainer.innerHTML = '';
             noEventsMessage.classList.toggle('hidden', eventsToRender.length > 0);
             const sortedEvents = eventsToRender.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -191,7 +248,7 @@
                             <h3 class="text-lg font-bold text-gray-900 leading-tight flex-grow">${event.name}</h3>
                             <div class="mt-4 space-y-2 text-sm text-gray-600">
                                 <p class="flex items-center"><i class="fa-solid fa-calendar-alt mr-3 w-4 text-center text-gray-400"></i>${new Date(event.date + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                                <p class="flex items-center"><i class="fa-solid fa-map-marker-alt mr-3 w-4 text-center text-gray-400"></i>${event.location || event.city}</p>
+                                <p class="flex items-center"><i class="fa-solid fa-map-marker-alt mr-3 w-4 text-center text-gray-400"></i>${event.location}</p>
                             </div>
                             <div class="mt-5 pt-4 border-t border-gray-200 text-xs text-gray-400">
                                Fuente: ${new URL(event.sourceUrl).hostname}
@@ -200,25 +257,16 @@
                     </a>`;
                 eventsContainer.insertAdjacentHTML('beforeend', eventCardHTML);
             });
-        };
+        }
 
-        signInAnonymously(auth).then(() => {
-            const todayString = new Date().toISOString().slice(0, 10);
-            const eventsCollection = collection(db, `artifacts/${appId}/public/data/events`);
-            const q = query(eventsCollection, where("date", ">=", todayString));
-
-            onSnapshot(q, (snapshot) => {
-                loadingIndicator.classList.add('hidden');
-                allEvents = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                applyFilters();
-            }, (error) => {
-                console.error("Error al obtener eventos: ", error);
-                loadingIndicator.innerHTML = '<p class="text-red-500">Error al cargar eventos. Revisa las reglas de Firestore.</p>';
-            });
-        }).catch((error) => {
-            console.error("Error de autenticación anónima:", error);
-            loadingIndicator.innerHTML = '<p class="text-red-500">Error de autenticación. La app no funcionará.</p>';
-        });
+        // --- INICIALIZACIÓN ---
+        async function initialize() {
+            const fetchPromises = sources.map(source => fetchAndParseRSS(source));
+            await Promise.all(fetchPromises);
+            
+            loadingIndicator.classList.add('hidden');
+            applyFilters();
+        }
 
         cityFilter.addEventListener('change', applyFilters);
         categoryFilter.addEventListener('change', applyFilters);
@@ -230,64 +278,7 @@
             applyFilters();
         });
 
-        const botToggleButton = document.getElementById('bot-toggle-button');
-        const botModal = document.getElementById('bot-modal');
-        const chatWindow = document.getElementById('chat-window');
-        const suggestEventButton = document.getElementById('suggest-event-button');
-        
-        const addBotMessage = (message) => {
-            const bubble = document.createElement('div');
-            bubble.className = 'chat-bubble bot p-3 rounded-lg';
-            bubble.innerHTML = message;
-            chatWindow.appendChild(bubble);
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-        };
-
-        botToggleButton.addEventListener('click', () => {
-            botModal.classList.toggle('visible');
-            if(botModal.classList.contains('visible') && chatWindow.children.length === 0) {
-                 addBotMessage("¡Hola! 👋 Soy tu asesor de eventos. ¿Buscas un panorama para hoy? ¡Déjamelo a mí!");
-            }
-        });
-
-        suggestEventButton.addEventListener('click', async () => {
-            suggestEventButton.disabled = true;
-            suggestEventButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span class="ml-2">Pensando...</span>';
-            
-            const todayString = new Date().toISOString().slice(0, 10);
-            const eventsForToday = allEvents.filter(event => event.date === todayString);
-
-            if (eventsForToday.length === 0) {
-                addBotMessage("¡Oh! Parece que hoy no hay eventos en la base de datos. ¡Pero no te preocupes! Mañana es otro día lleno de posibilidades. 😉");
-            } else {
-                const eventListForAI = eventsForToday.map(e => `- ${e.name} en ${e.city} (${e.category})`).join('\n');
-                const prompt = `De la siguiente lista de eventos para hoy, elige solo uno que creas que es el más interesante o divertido. Preséntalo de forma entusiasta y amigable, como una recomendación personal. Describe por qué es una buena idea ir. Incluye el nombre del evento en negrita. Aquí está la lista:\n\n${eventListForAI}`;
-
-                try {
-                    const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
-                    const apiKey = ""; 
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    const result = await response.json();
-                    
-                    if (result.candidates && result.candidates.length > 0) {
-                        const text = result.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                        addBotMessage(text);
-                    } else {
-                        addBotMessage("¡Hay tantas opciones buenas que no pude decidirme! Te recomiendo echar un vistazo a la lista principal. ¡Seguro encuentras algo genial! ✨");
-                    }
-                } catch (error) {
-                    console.error("Error con la API de IA:", error);
-                    addBotMessage("Mmm, mi cerebro de IA tuvo un cortocircuito. 🧠⚡ Inténtalo de nuevo en un momento, por favor.");
-                }
-            }
-            suggestEventButton.disabled = false;
-            suggestEventButton.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i><span class="ml-2">Sorpréndeme para hoy</span>';
-        });
+        initialize();
     </script>
 </body>
 </html>
