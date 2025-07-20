@@ -10,17 +10,36 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .modal-hidden { display: none; }
-        .modal-visible { display: flex; }
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
         .tag { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; text-transform: uppercase; }
+        .bot-fab { position: fixed; bottom: 2rem; right: 2rem; z-index: 40; }
+        .bot-modal {
+            position: fixed;
+            bottom: 6.5rem;
+            right: 2rem;
+            width: 350px;
+            height: 450px;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transform: scale(0.5);
+            transform-origin: bottom right;
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            z-index: 40;
+            display: flex;
+            flex-direction: column;
+        }
+        .bot-modal.visible { transform: scale(1); opacity: 1; }
+        .chat-bubble { max-width: 85%; }
+        .chat-bubble.bot { background-color: #e5e7eb; align-self: flex-start; }
+        .chat-bubble.user { background-color: #4f46e5; color: white; align-self: flex-end; }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
     <div class="container mx-auto p-4 md:p-8">
         <header class="text-center mb-8">
             <h1 class="text-4xl md:text-5xl font-bold text-indigo-600">Agenda Nacional de Eventos</h1>
-            <p class="text-gray-600 mt-2">Tu portal centralizado para descubrir eventos gratuitos en todo el país.</p>
+            <p class="text-gray-600 mt-2">Tu portal para descubrir eventos gratuitos en todo Chile, actualizado automáticamente.</p>
         </header>
         <div class="bg-white p-4 rounded-lg shadow-md mb-8 flex flex-wrap items-center justify-center gap-4 md:gap-6">
             <div class="flex items-center gap-2">
@@ -53,16 +72,36 @@
         <main id="events-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         </main>
         <div id="loading-indicator" class="text-center py-12">
-            <p class="text-lg text-gray-500">Conectando con la base de datos...</p>
+            <p class="text-lg text-gray-500">Buscando eventos en la base de datos...</p>
         </div>
         <div id="no-events-message" class="hidden text-center py-12 bg-white rounded-lg shadow-md">
             <p class="text-xl font-semibold text-gray-700">No se encontraron eventos con los filtros actuales</p>
-            <p class="text-gray-500 mt-2">Prueba a cambiar los filtros.</p>
+            <p class="text-gray-500 mt-2">Prueba a cambiar los filtros. El sistema se actualiza automáticamente cada hora.</p>
         </div>
     </div>
+
+    <!-- Asesor IA Flotante -->
+    <div class="bot-fab">
+        <button id="bot-toggle-button" class="bg-indigo-600 text-white w-16 h-16 rounded-full shadow-lg flex items-center justify-center text-2xl hover:bg-indigo-700 transition-transform transform hover:scale-110">
+            <i class="fa-solid fa-robot"></i>
+        </button>
+    </div>
+    <div id="bot-modal" class="bot-modal bg-white overflow-hidden">
+        <div class="bg-indigo-600 text-white p-4 text-center font-bold">Asesor de Eventos IA</div>
+        <div id="chat-window" class="flex-grow p-4 flex flex-col gap-3 overflow-y-auto">
+            <!-- Mensajes del chat se insertan aquí -->
+        </div>
+        <div id="bot-actions" class="p-2 border-t border-gray-200">
+            <button id="suggest-event-button" class="w-full bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition-colors text-sm">
+                Búscame un evento para hoy
+            </button>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, query } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        
         const firebaseConfig = {
             apiKey: "AIzaSyCaErRFWD_Z9UgE0bBoblY-H9_zKh-vSII",
             authDomain: "appeventos-de195.firebaseapp.com",
@@ -72,22 +111,26 @@
             appId: "1:176519875945:web:aa5d3e2e14f3231e8ac1f8",
             measurementId: "G-WJRS95EX7B"
         };
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const appId = firebaseConfig.projectId;
         let allEvents = [];
+
         const eventsContainer = document.getElementById('events-container');
         const loadingIndicator = document.getElementById('loading-indicator');
         const noEventsMessage = document.getElementById('no-events-message');
         const cityFilter = document.getElementById('city-filter');
         const categoryFilter = document.getElementById('category-filter');
         const dateFilter = document.getElementById('date-filter');
+
         const categoryColors = {
             'Música': 'bg-blue-100 text-blue-800', 'Arte': 'bg-purple-100 text-purple-800',
             'Cine': 'bg-red-100 text-red-800', 'Teatro': 'bg-yellow-100 text-yellow-800',
             'Familia': 'bg-green-100 text-green-800', 'Aire Libre': 'bg-teal-100 text-teal-800',
             'Default': 'bg-gray-100 text-gray-800'
         };
+
         const applyFilters = () => {
             let filteredEvents = allEvents;
             if (cityFilter.value) filteredEvents = filteredEvents.filter(e => e.city === cityFilter.value);
@@ -95,6 +138,7 @@
             if (dateFilter.value) filteredEvents = filteredEvents.filter(e => e.date === dateFilter.value);
             renderEvents(filteredEvents);
         };
+
         const renderEvents = (eventsToRender) => {
             eventsContainer.innerHTML = '';
             noEventsMessage.classList.toggle('hidden', eventsToRender.length > 0);
@@ -104,14 +148,14 @@
                 const imageUrl = event.imageUrl || placeholderImage;
                 const colorClass = categoryColors[event.category] || categoryColors['Default'];
                 const eventCardHTML = `
-                    <a href="${event.sourceUrl}" target="_blank" class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col transition-transform transform hover:-translate-y-1 hover:shadow-xl">
+                    <a href="${event.sourceUrl}" target="_blank" rel="noopener noreferrer" class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col transition-transform transform hover:-translate-y-1 hover:shadow-xl">
                         <img src="${imageUrl}" alt="Imagen de ${event.name}" class="w-full h-40 object-cover" onerror="this.src='${placeholderImage}'">
                         <div class="p-4 flex flex-col flex-grow">
                             <div class="mb-2 flex justify-between items-start">
                                 <h3 class="text-lg font-bold text-gray-900 leading-tight">${event.name}</h3>
                                 <span class="tag ${colorClass} flex-shrink-0 ml-2">${event.category}</span>
                             </div>
-                            <p class="text-sm text-gray-500 mb-2 flex items-center"><i class="fa-solid fa-map-marker-alt mr-2 text-gray-400"></i>${event.city}</p>
+                            <p class="text-sm text-gray-500 mb-2 flex items-center"><i class="fa-solid fa-map-marker-alt mr-2 text-gray-400"></i>${event.location || event.city}</p>
                             <p class="text-sm text-gray-600 font-semibold mb-3 flex items-center"><i class="fa-solid fa-calendar-alt mr-2 text-gray-400"></i>${new Date(event.date + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                             <p class="text-sm text-gray-600 flex-grow mb-4">${event.description}</p>
                             <div class="mt-auto pt-3 border-t border-gray-200 text-xs text-gray-400">
@@ -122,8 +166,12 @@
                 eventsContainer.insertAdjacentHTML('beforeend', eventCardHTML);
             });
         };
+
+        const todayString = new Date().toISOString().slice(0, 10);
         const eventsCollection = collection(db, `artifacts/${appId}/public/data/events`);
-        onSnapshot(query(eventsCollection), (snapshot) => {
+        const q = query(eventsCollection, where("date", ">=", todayString));
+
+        onSnapshot(q, (snapshot) => {
             loadingIndicator.classList.add('hidden');
             allEvents = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             applyFilters();
@@ -131,6 +179,7 @@
             console.error("Error al obtener eventos: ", error);
             loadingIndicator.textContent = "Error al cargar los eventos.";
         });
+
         cityFilter.addEventListener('change', applyFilters);
         categoryFilter.addEventListener('change', applyFilters);
         dateFilter.addEventListener('change', applyFilters);
@@ -139,6 +188,71 @@
             categoryFilter.value = '';
             dateFilter.value = '';
             applyFilters();
+        });
+
+        // Lógica del Bot IA
+        const botToggleButton = document.getElementById('bot-toggle-button');
+        const botModal = document.getElementById('bot-modal');
+        const chatWindow = document.getElementById('chat-window');
+        const suggestEventButton = document.getElementById('suggest-event-button');
+        
+        const addBotMessage = (message) => {
+            const bubble = document.createElement('div');
+            bubble.className = 'chat-bubble bot p-3 rounded-lg';
+            bubble.innerHTML = message; // Usamos innerHTML para poder formatear con negritas, etc.
+            chatWindow.appendChild(bubble);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        };
+
+        botToggleButton.addEventListener('click', () => {
+            botModal.classList.toggle('visible');
+            if(botModal.classList.contains('visible') && chatWindow.children.length === 0) {
+                 addBotMessage("¡Hola! Soy tu asesor de eventos. ¿Buscas algo entretenido para hoy? Presiona el botón de abajo y usaré la IA para recomendarte algo genial.");
+            }
+        });
+
+        suggestEventButton.addEventListener('click', async () => {
+            suggestEventButton.disabled = true;
+            suggestEventButton.textContent = "Pensando...";
+            
+            const eventsForToday = allEvents.filter(event => event.date === todayString);
+
+            if (eventsForToday.length === 0) {
+                addBotMessage("Vaya, parece que no hay eventos programados para hoy en la base de datos. ¡Vuelve a consultar mañana!");
+                suggestEventButton.disabled = false;
+                suggestEventButton.textContent = "Búscame un evento para hoy";
+                return;
+            }
+
+            const eventListForAI = eventsForToday.map(e => `- ${e.name} en ${e.city} (${e.category})`).join('\n');
+            const prompt = `De la siguiente lista de eventos para hoy, elige solo uno que creas que es el más interesante o divertido. Preséntalo de forma entusiasta y amigable, como una recomendación personal. Describe por qué es una buena idea ir. Incluye el nombre del evento en negrita. Aquí está la lista:\n\n${eventListForAI}`;
+
+            try {
+                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = { contents: chatHistory };
+                const apiKey = ""; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    addBotMessage(text);
+                } else {
+                    addBotMessage("No pude decidirme, ¡todos se ven geniales! ¿Por qué no le echas un vistazo a la lista tú mismo?");
+                }
+            } catch (error) {
+                console.error("Error con la API de IA:", error);
+                addBotMessage("Tuve un problema para conectarme con mi cerebro de IA. Inténtalo de nuevo en un momento.");
+            } finally {
+                suggestEventButton.disabled = false;
+                suggestEventButton.textContent = "Búscame un evento para hoy";
+            }
         });
     </script>
 </body>
