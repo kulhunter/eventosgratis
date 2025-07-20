@@ -3,243 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eventis | Tu Agenda de Eventos Gratuitos en Chile</title>
-    
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="Encuentra los mejores panoramas y eventos gratuitos en todo Chile. Conciertos, arte, teatro, cine y más, actualizados en vivo desde las mejores fuentes.">
-    <meta name="keywords" content="eventos gratis, panoramas, chile, santiago, valparaíso, concepción, conciertos, cultura, gratis, agenda cultural">
-    <meta name="author" content="Eventis">
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts: Poppins -->
+    <title>Eventis | Tu Agenda Inteligente de Panoramas</title>
+    <meta name="description" content="Encuentra panoramas perfectos para ti. Filtra por tipo de plan (pareja, solo, grupo), presupuesto y más. Actualizado desde más de 100 fuentes.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Poppins', sans-serif; scroll-behavior: smooth; background-color: #f0f2f5; }
+        body { font-family: 'Poppins', sans-serif; background-color: #f0f2f5; }
         .hero-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
-        .tag { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .tag { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+        .filter-btn { transition: all 0.2s ease; border: 2px solid transparent; }
+        .filter-btn.active { border-color: #4f46e5; background-color: #e0e7ff; color: #4f46e5; }
     </style>
-
-    <!-- JSON-LD Structured Data for SEO -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Eventis",
-      "url": "https://kulhunter.github.io/eventosgratis/",
-      "description": "Tu Agenda de Eventos Gratuitos en Chile",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://kulhunter.github.io/eventosgratis/?q={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-    }
-    </script>
 </head>
 <body class="antialiased">
-    <!-- Header -->
     <header class="hero-gradient text-white py-12 sm:py-20">
         <div class="container mx-auto px-6 text-center">
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">Descubre Eventos Increíbles ✨</h1>
-            <p class="mt-4 text-lg sm:text-xl text-indigo-200 max-w-3xl mx-auto">Tu portal para encontrar panoramas gratuitos en todo Chile, actualizado en vivo.</p>
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold">Encuentra Tu Panorama Ideal ✨</h1>
+            <p class="mt-4 text-lg sm:text-xl text-indigo-200 max-w-3xl mx-auto">Nuestro motor analiza +100 sitios para darte el plan perfecto según tu compañía y presupuesto.</p>
         </div>
     </header>
 
-    <div class="container mx-auto p-4 md:p-8 -mt-10">
-        <!-- Filter Controls -->
-        <div class="bg-white p-4 rounded-xl shadow-lg mb-10 flex flex-wrap items-center justify-center gap-4 md:gap-6">
-            <div class="flex items-center gap-2">
-                <label for="city-filter" class="text-sm font-medium text-gray-600"><i class="fa-solid fa-map-marker-alt mr-1 text-indigo-500"></i>Ciudad</label>
-                <select id="city-filter" class="border-gray-200 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
-                    <option value="">Todas</option>
-                    <option value="Santiago">Santiago</option>
-                    <option value="Nacional">Nacional</option>
-                </select>
+    <div class="container mx-auto p-4 md:p-8 -mt-16">
+        <!-- Search & Filter Panel -->
+        <div class="bg-white p-6 rounded-xl shadow-2xl mb-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                <!-- Search by Keyword -->
+                <div class="md:col-span-3 lg:col-span-2">
+                    <label for="search-input" class="text-sm font-bold text-gray-600 block mb-2">🔎 ¿Qué buscas?</label>
+                    <input type="text" id="search-input" placeholder="Ej: Concierto, exposición, teatro..." class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <!-- Filter by Plan Type -->
+                <div>
+                    <label class="text-sm font-bold text-gray-600 block mb-2">👤 ¿Con quién vas?</label>
+                    <select id="plan-type-filter" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">Cualquiera</option>
+                        <option value="solo">Solo</option>
+                        <option value="pareja">En Pareja</option>
+                        <option value="grupo">En Grupo</option>
+                    </select>
+                </div>
+                <!-- Filter by Budget -->
+                <div>
+                    <label class="text-sm font-bold text-gray-600 block mb-2">💰 Presupuesto (USD)</label>
+                    <select id="budget-filter" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">Cualquiera</option>
+                        <option value="0">Gratis</option>
+                        <option value="10">$1 - $10</option>
+                        <option value="20">$11 - $20</option>
+                        <option value="30">$21 - $30</option>
+                        <option value="40">$31 - $40</option>
+                        <option value="50">$41 - $50</option>
+                        <option value="51">$51 o más</option>
+                        <option value="-1">No especificado</option>
+                    </select>
+                </div>
+                <!-- Search Button -->
+                <div class="md:col-span-3 lg:col-span-1 flex items-end">
+                    <button id="search-button" class="w-full bg-indigo-600 text-white px-4 py-3 rounded-lg hover:bg-indigo-700 transition-colors font-bold text-lg">Buscar</button>
+                </div>
             </div>
-            <div class="flex items-center gap-2">
-                <label for="category-filter" class="text-sm font-medium text-gray-600"><i class="fa-solid fa-tag mr-1 text-indigo-500"></i>Categoría</label>
-                <select id="category-filter" class="border-gray-200 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
-                    <option value="">Todas</option>
-                    <option value="Música">Música 🎵</option>
-                    <option value="Arte">Arte 🎨</option>
-                    <option value="Cine">Cine 🎬</option>
-                    <option value="Teatro">Teatro 🎭</option>
-                    <option value="Familia">Familia 👨‍👩‍👧‍👦</option>
-                    <option value="Aire Libre">Aire Libre 🌳</option>
-                    <option value="Cultura">Cultura 🏛️</option>
-                </select>
-            </div>
-            <div class="flex items-center gap-2">
-                <label for="date-filter" class="text-sm font-medium text-gray-600"><i class="fa-solid fa-calendar-alt mr-1 text-indigo-500"></i>Fecha</label>
-                <input type="date" id="date-filter" class="border-gray-200 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
-            </div>
-            <button id="btn-clear-filters" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm font-semibold">Limpiar</button>
         </div>
 
-        <!-- Events Grid -->
         <main id="events-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         </main>
-
-        <!-- Loading / Empty State -->
+        
         <div id="loading-indicator" class="text-center py-12">
             <i class="fas fa-spinner fa-spin text-4xl text-indigo-500"></i>
-            <p class="text-lg text-gray-600 mt-4">Buscando eventos gratuitos en vivo...</p>
+            <p class="text-lg text-gray-600 mt-4">Contactando a nuestro motor de búsqueda...</p>
         </div>
         <div id="no-events-message" class="hidden text-center py-16 px-6 bg-white rounded-xl shadow-lg">
             <img src="https://placehold.co/128x128/e0e7ff/6366f1?text=🤔" alt="Ícono de búsqueda" class="mx-auto rounded-full">
-            <p class="text-2xl font-bold text-gray-800 mt-6">¡Ups! No encontramos eventos gratuitos</p>
-            <p class="text-gray-500 mt-2 max-w-md mx-auto">No hay noticias sobre eventos gratuitos en nuestras fuentes en este momento. ¡Intenta recargar la página más tarde!</p>
+            <p class="text-2xl font-bold text-gray-800 mt-6">¡Ups! No encontramos panoramas</p>
+            <p class="text-gray-500 mt-2 max-w-md mx-auto">Prueba con otros filtros o palabras clave. Nuestro motor busca constantemente, ¡vuelve a intentarlo!</p>
         </div>
     </div>
 
     <script type="module">
         // --- CONFIGURACIÓN ---
-        let allEvents = [];
-        const CORS_PROXY = "https://api.allorigins.win/raw?url=";
+        // URL actualizada para conectar con tu motor en Render
+        const API_URL = "https://eventis-backend.onrender.com/events"; 
         
-        const sources = [
-            { name: "El Mostrador Cultura", url: "https://www.elmostrador.cl/cultura/feed/", city: "Nacional" },
-            { name: "ChileCultura", url: "https://chilecultura.gob.cl/agendacultural/feed", city: "Nacional" },
-            { name: "El Dínamo Cultura", url: "https://www.eldinamo.cl/cultura/feed/", city: "Nacional" },
-            { name: "Agenda Chilena", url: "https://www.agendachilena.cl/feed/", city: "Nacional" },
-            { name: "Parlante.cl", url: "https://parlante.cl/feed/", city: "Nacional" },
-            { name: "BioBioChile Cultura", url: "https://www.biobiochile.cl/lista/categorias/cultura/feed", city: "Nacional" },
-            { name: "Pousta", url: "https://www.pousta.com/feed/", city: "Nacional" },
-            { name: "Zancada", url: "https://www.zancada.cl/feed/", city: "Nacional" },
-            { name: "La Tercera Culto", url: "https://www.latercera.com/culto/feed/", city: "Nacional"},
-            { name: "Cooperativa Cultura", url: "https://www.cooperativa.cl/noticias/cultura/rss/", city: "Nacional"},
-            { name: "Emol Espectáculos", url: "https://www.emol.com/rss/espectaculos/", city: "Nacional"}
-        ];
-
-        // --- REFERENCIAS AL DOM ---
+        let allEvents = [];
         const eventsContainer = document.getElementById('events-container');
         const loadingIndicator = document.getElementById('loading-indicator');
         const noEventsMessage = document.getElementById('no-events-message');
-        const cityFilter = document.getElementById('city-filter');
-        const categoryFilter = document.getElementById('category-filter');
-        const dateFilter = document.getElementById('date-filter');
+        const searchInput = document.getElementById('search-input');
+        const planTypeFilter = document.getElementById('plan-type-filter');
+        const budgetFilter = document.getElementById('budget-filter');
+        const searchButton = document.getElementById('search-button');
 
-        const categoryColors = {
-            'Música': 'bg-blue-100 text-blue-800', 'Arte': 'bg-purple-100 text-purple-800',
-            'Cine': 'bg-red-100 text-red-800', 'Teatro': 'bg-yellow-100 text-yellow-800',
-            'Familia': 'bg-green-100 text-green-800', 'Aire Libre': 'bg-teal-100 text-teal-800',
-            'Cultura': 'bg-gray-100 text-gray-800'
+        const planTypeEmojis = { 'solo': '👤', 'pareja': '❤️', 'grupo': '🎉', 'cualquiera': '✨' };
+        const budgetColors = {
+            0: 'bg-green-100 text-green-800', 10: 'bg-blue-100 text-blue-800',
+            20: 'bg-indigo-100 text-indigo-800', 30: 'bg-purple-100 text-purple-800',
+            40: 'bg-pink-100 text-pink-800', 50: 'bg-red-100 text-red-800',
+            51: 'bg-black text-white', '-1': 'bg-gray-100 text-gray-800'
         };
-        
-        const categoryEmojis = {
-            'Música': '🎵', 'Arte': '🎨', 'Cine': '🎬', 'Teatro': '🎭',
-            'Familia': '👨‍👩‍👧‍👦', 'Aire Libre': '🌳', 'Cultura': '🏛️'
+        const budgetLabels = {
+            0: 'Gratis', 10: '< $10', 20: '$11-$20', 30: '$21-$30',
+            40: '$31-$40', 50: '$41-$50', 51: '> $51', '-1': 'N/E'
         };
-
-        // --- LÓGICA DE FILTRADO Y EXTRACCIÓN ---
-
-        function inferCategory(text) {
-            const lowerText = text.toLowerCase();
-            if (lowerText.includes('música') || lowerText.includes('concierto') || lowerText.includes('banda')) return 'Música';
-            if (lowerText.includes('arte') || lowerText.includes('exposición') || lowerText.includes('galería')) return 'Arte';
-            if (lowerText.includes('cine') || lowerText.includes('película') || lowerText.includes('documental')) return 'Cine';
-            if (lowerText.includes('teatro') || lowerText.includes('obra') || lowerText.includes('danza')) return 'Teatro';
-            if (lowerText.includes('niños') || lowerText.includes('familia') || lowerText.includes('taller')) return 'Familia';
-            if (lowerText.includes('parque') || lowerText.includes('aire libre') || lowerText.includes('feria')) return 'Aire Libre';
-            return 'Cultura';
-        }
-
-        function isEventFree(text) {
-            const lowerText = text.toLowerCase();
-            const freeKeywords = ['gratis', 'gratuito', 'entrada liberada', 'sin costo', 'acceso gratuito', 'acceso liberado'];
-            return freeKeywords.some(keyword => lowerText.includes(keyword));
-        }
-        
-        function extractLocation(text) {
-            const lowerText = text.toLowerCase();
-            const knownLocations = {
-                "gam": "Centro GAM", "centro gam": "Centro GAM",
-                "centro cultural la moneda": "CC La Moneda", "cclm": "CC La Moneda",
-                "matucana 100": "Matucana 100", "m100": "Matucana 100",
-                "museo de bellas artes": "Museo Nacional de Bellas Artes", "mnba": "Museo Nacional de Bellas Artes",
-                "biblioteca de santiago": "Biblioteca de Santiago"
-            };
-            for (const key in knownLocations) {
-                if (lowerText.includes(key)) {
-                    return knownLocations[key];
-                }
-            }
-            return "Revisar en el sitio web";
-        }
-
-        async function fetchAndParseRSS(source) {
-            try {
-                const response = await fetch(`${CORS_PROXY}${encodeURIComponent(source.url)}`);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const text = await response.text();
-                
-                const parser = new DOMParser();
-                const xml = parser.parseFromString(text, "application/xml");
-                const items = xml.querySelectorAll("item");
-                
-                items.forEach(item => {
-                    const title = item.querySelector("title")?.textContent || '';
-                    const link = item.querySelector("link")?.textContent || '';
-                    const description = item.querySelector("description")?.textContent.replace(/<[^>]*>?/gm, '') || '';
-                    const fullText = title + ' ' + description;
-                    
-                    if (!isEventFree(fullText)) {
-                        return; 
-                    }
-
-                    if (title && link) {
-                        const pubDate = item.querySelector("pubDate")?.textContent || new Date().toISOString();
-                        allEvents.push({
-                            name: title,
-                            description: description.substring(0, 150) + '...',
-                            sourceUrl: link,
-                            city: source.city,
-                            location: extractLocation(fullText),
-                            category: inferCategory(fullText),
-                            date: new Date(pubDate).toISOString().slice(0, 10)
-                        });
-                    }
-                });
-            } catch (error) {
-                console.error(`Error fetching source ${source.name}:`, error);
-            }
-        }
 
         function applyFilters() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const planType = planTypeFilter.value;
+            const budget = budgetFilter.value;
+
             let filteredEvents = allEvents;
-            if (cityFilter.value) filteredEvents = filteredEvents.filter(e => e.city === cityFilter.value);
-            if (categoryFilter.value) filteredEvents = filteredEvents.filter(e => e.category === categoryFilter.value);
-            if (dateFilter.value) filteredEvents = filteredEvents.filter(e => e.date === dateFilter.value);
+
+            if (searchTerm) {
+                filteredEvents = filteredEvents.filter(e => e.name.toLowerCase().includes(searchTerm));
+            }
+            if (planType) {
+                filteredEvents = filteredEvents.filter(e => e.planType === planType);
+            }
+            if (budget) {
+                filteredEvents = filteredEvents.filter(e => e.budget.toString() === budget);
+            }
+            
             renderEvents(filteredEvents);
         }
 
         function renderEvents(eventsToRender) {
             eventsContainer.innerHTML = '';
-            noEventsMessage.classList.toggle('hidden', eventsToRender.length > 0);
+            noEventsMessage.classList.toggle('hidden', eventsToRender.length === 0);
+            
             const sortedEvents = eventsToRender.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
             sortedEvents.forEach(event => {
-                const colorClass = categoryColors[event.category] || categoryColors['Cultura'];
-                const emoji = categoryEmojis[event.category] || '✨';
+                const emoji = planTypeEmojis[event.planType] || '✨';
+                const budgetLabel = budgetLabels[event.budget];
+                const budgetColor = budgetColors[event.budget];
+
                 const eventCardHTML = `
                     <a href="${event.sourceUrl}" target="_blank" rel="noopener noreferrer" class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col card-hover">
                         <div class="h-36 flex items-center justify-center text-6xl bg-gray-50 rounded-t-xl">
                             ${emoji}
                         </div>
                         <div class="p-5 flex flex-col flex-grow">
-                            <span class="tag ${colorClass} self-start mb-3">${event.category}</span>
-                            <h3 class="text-lg font-bold text-gray-900 leading-tight flex-grow">${event.name}</h3>
-                            <div class="mt-4 space-y-2 text-sm text-gray-600">
-                                <p class="flex items-center"><i class="fa-solid fa-calendar-alt mr-3 w-4 text-center text-gray-400"></i>${new Date(event.date + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                                <p class="flex items-center"><i class="fa-solid fa-map-marker-alt mr-3 w-4 text-center text-gray-400"></i>${event.location}</p>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="tag ${budgetColor}">${budgetLabel}</span>
+                                <span class="text-xs text-gray-400">${event.city}</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-900 leading-tight flex-grow mb-3">${event.name}</h3>
+                            <div class="mt-auto space-y-2 text-sm text-gray-600">
+                                <p class="flex items-center"><i class="fa-solid fa-calendar-alt mr-3 w-4 text-center text-gray-400"></i>${new Date(event.date + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}</p>
                             </div>
                             <div class="mt-5 pt-4 border-t border-gray-200 text-xs text-gray-400">
                                Fuente: ${new URL(event.sourceUrl).hostname}
@@ -249,25 +162,34 @@
                 eventsContainer.insertAdjacentHTML('beforeend', eventCardHTML);
             });
         }
-
-        // --- INICIALIZACIÓN ---
-        async function initialize() {
-            const fetchPromises = sources.map(source => fetchAndParseRSS(source));
-            await Promise.all(fetchPromises);
-            
-            loadingIndicator.classList.add('hidden');
-            applyFilters();
-        }
-
-        cityFilter.addEventListener('change', applyFilters);
-        categoryFilter.addEventListener('change', applyFilters);
-        dateFilter.addEventListener('change', applyFilters);
-        document.getElementById('btn-clear-filters').addEventListener('click', () => {
-            cityFilter.value = '';
-            categoryFilter.value = '';
-            dateFilter.value = '';
-            applyFilters();
+        
+        searchButton.addEventListener('click', applyFilters);
+        searchInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') applyFilters();
         });
+
+
+        async function initialize() {
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('La respuesta del motor no fue buena.');
+                allEvents = await response.json();
+
+                loadingIndicator.classList.add('hidden');
+                
+                if (allEvents.length === 0) {
+                    noEventsMessage.classList.remove('hidden');
+                    return;
+                }
+                
+                renderEvents(allEvents);
+
+            } catch (error) {
+                console.error("Error al cargar eventos:", error);
+                loadingIndicator.classList.add('hidden');
+                noEventsMessage.classList.remove('hidden');
+            }
+        }
 
         initialize();
     </script>
