@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda de Eventos Colaborativa</title>
+    
+    <!-- Tailwind CSS para el diseño -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Estilos personalizados adicionales */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Estilo para la vista de línea de tiempo */
+        .timeline-view .event-card {
+            display: flex;
+            position: relative;
+            margin-left: 2rem;
+            padding-left: 2rem;
+            border-left: 2px solid #cbd5e1; /* gray-300 */
+            padding-bottom: 2rem;
+        }
+        .timeline-view .event-card:last-child {
+            border-left: 2px solid transparent;
+        }
+        .timeline-view .event-card::before {
+            content: '';
+            position: absolute;
+            left: -0.5rem;
+            top: 0;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 9999px;
+            background-color: #4f46e5; /* indigo-600 */
+            border: 2px solid #ffffff;
+        }
+        /* Animación para el modal */
+        .modal-hidden {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-visible {
+            display: flex;
+            opacity: 1;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border-left-color: #fff;
+            animation: spin 1s ease infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Contenedor principal -->
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-indigo-600">Agenda de Eventos</h1>
+            <p class="text-gray-600 mt-2">Descubre y comparte eventos gratuitos en tu comunidad.</p>
+            <div id="user-id-display" class="mt-4 text-xs text-gray-500 font-mono"></div>
+        </header>
+
+        <!-- Controles y Filtros -->
+        <div class="bg-white p-4 rounded-lg shadow-md mb-8 flex flex-wrap items-center justify-center gap-4">
+            <button id="btn-show-all" class="bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition-colors">Mostrar Todos</button>
+            <button id="btn-today-events" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors">🎉 Eventos para Hoy</button>
+            <div class="flex items-center gap-2">
+                <label for="date-filter" class="text-sm font-medium">Filtrar por fecha:</label>
+                <input type="date" id="date-filter" class="border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <button id="btn-toggle-view" class="bg-gray-700 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition-colors">Ver como Línea de Tiempo</button>
+        </div>
+        
+        <!-- Botón de Scraping Simulado -->
+        <div class="text-center mb-8">
+             <button id="btn-simulate-scraping" class="bg-cyan-500 text-white px-6 py-3 rounded-lg hover:bg-cyan-600 transition-colors flex items-center justify-center gap-2 mx-auto disabled:bg-cyan-300">
+                <span id="scraping-btn-text">Buscar Nuevos Eventos (Simulación)</span>
+                <div id="scraping-spinner" class="spinner hidden"></div>
+            </button>
+        </div>
+
+
+        <!-- Contenedor de Eventos -->
+        <main id="events-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Las fichas de eventos se insertarán aquí con JavaScript -->
+        </main>
+        <div id="loading-indicator" class="text-center py-12">
+            <p class="text-lg text-gray-500">Cargando eventos...</p>
+        </div>
+        <div id="no-events-message" class="hidden text-center py-12 bg-white rounded-lg shadow-md">
+            <p class="text-xl font-semibold text-gray-700">No se encontraron eventos</p>
+            <p class="text-gray-500 mt-2">Prueba a cambiar el filtro o añade un nuevo evento.</p>
+        </div>
+
+    </div>
+
+    <!-- Botón flotante para añadir evento -->
+    <button id="btn-open-modal" class="fixed bottom-8 right-8 bg-indigo-600 text-white w-16 h-16 rounded-full shadow-lg flex items-center justify-center text-3xl hover:bg-indigo-700 transition-transform transform hover:scale-110">
+        +
+    </button>
+
+    <!-- Modal para el formulario de nuevo evento -->
+    <div id="event-modal" class="modal-hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg">
+            <h2 class="text-2xl font-bold mb-6">Cargar Nuevo Evento</h2>
+            <form id="new-event-form">
+                <div class="mb-4">
+                    <label for="event-name" class="block text-sm font-medium text-gray-700">Nombre del Evento</label>
+                    <input type="text" id="event-name" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="event-date" class="block text-sm font-medium text-gray-700">Fecha</label>
+                    <input type="date" id="event-date" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="event-description" class="block text-sm font-medium text-gray-700">Descripción</label>
+                    <textarea id="event-description" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="event-image-url" class="block text-sm font-medium text-gray-700">URL de la Imagen (Opcional)</label>
+                    <input type="url" id="event-image-url" placeholder="https://ejemplo.com/imagen.jpg" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div class="flex justify-end gap-4 mt-8">
+                    <button type="button" id="btn-close-modal" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors">Cancelar</button>
+                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors">Guardar Evento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase y Lógica de la Aplicación -->
+    <script type="module">
+        // Importaciones de Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+        // --- CONFIGURACIÓN DE FIREBASE ---
+        // Tu configuración personal de Firebase ha sido insertada aquí.
+        const firebaseConfig = {
+            apiKey: "AIzaSyCaErRFWD_Z9UgE0bBoblY-H9_zKh-vSII",
+            authDomain: "appeventos-de195.firebaseapp.com",
+            projectId: "appeventos-de195",
+            storageBucket: "appeventos-de195.firebasestorage.app",
+            messagingSenderId: "176519875945",
+            appId: "1:176519875945:web:aa5d3e2e14f3231e8ac1f8",
+            measurementId: "G-WJRS95EX7B"
+        };
+        
+        // --- INICIALIZACIÓN DE FIREBASE (NO TOCAR) ---
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const appId = firebaseConfig.projectId; // Usamos el projectId para la ruta de la base de datos
+
+        // --- VARIABLES GLOBALES Y REFERENCIAS AL DOM ---
+        let allEvents = [];
+        let currentUserId = null;
+        let isTimelineView = false;
+        const eventsContainer = document.getElementById('events-container');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const noEventsMessage = document.getElementById('no-events-message');
+        const userIdDisplay = document.getElementById('user-id-display');
+
+        // --- LÓGICA DE LA APLICACIÓN ---
+
+        // Función para renderizar los eventos en el DOM
+        const renderEvents = (eventsToRender) => {
+            eventsContainer.innerHTML = '';
+            
+            if (eventsToRender.length === 0) {
+                noEventsMessage.classList.remove('hidden');
+            } else {
+                noEventsMessage.classList.add('hidden');
+            }
+            
+            const sortedEvents = eventsToRender.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            sortedEvents.forEach(event => {
+                const placeholderImage = `https://placehold.co/600x400/e0e7ff/4f46e5?text=${encodeURIComponent(event.name)}`;
+                const imageUrl = event.imageUrl || placeholderImage;
+
+                const eventCardHTML = `
+                    <article class="event-card bg-white rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 flex flex-col">
+                        <img src="${imageUrl}" alt="Imagen de ${event.name}" class="w-full h-48 object-cover" onerror="this.src='${placeholderImage}'">
+                        <div class="p-6 flex flex-col flex-grow">
+                            <h3 class="text-xl font-bold mb-2">${event.name}</h3>
+                            <p class="text-indigo-500 font-semibold mb-3">${new Date(event.date + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                            <p class="text-gray-600 flex-grow mb-4">${event.description}</p>
+                            <div class="mt-auto pt-4 border-t border-gray-200 flex justify-between items-center">
+                               <span class="text-xs text-gray-400">Creado por: ${event.creatorId ? event.creatorId.substring(0, 8) : 'Anónimo'}...</span>
+                               ${event.creatorId === currentUserId ? `<button data-id="${event.id}" class="btn-delete text-red-500 hover:text-red-700 font-semibold">Eliminar</button>` : ''}
+                            </div>
+                        </div>
+                    </article>
+                `;
+                eventsContainer.insertAdjacentHTML('beforeend', eventCardHTML);
+            });
+        };
+
+        // --- MANEJO DE AUTENTICACIÓN ---
+        signInAnonymously(auth)
+            .then((result) => {
+                currentUserId = result.user.uid;
+                userIdDisplay.textContent = `Tu ID de usuario: ${currentUserId}`;
+                
+                // Escuchar eventos solo después de autenticarse
+                const eventsCollection = collection(db, `artifacts/${appId}/public/data/events`);
+                const q = query(eventsCollection);
+
+                onSnapshot(q, (snapshot) => {
+                    loadingIndicator.classList.add('hidden');
+                    allEvents = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    const currentFilter = document.getElementById('date-filter').value;
+                    if (currentFilter) {
+                        const filteredEvents = allEvents.filter(event => event.date === currentFilter);
+                        renderEvents(filteredEvents);
+                    } else {
+                        renderEvents(allEvents);
+                    }
+                }, (error) => {
+                    console.error("Error al obtener eventos: ", error);
+                    loadingIndicator.textContent = "Error al cargar los eventos.";
+                });
+            })
+            .catch((error) => {
+                console.error("Error de autenticación anónima:", error);
+                loadingIndicator.textContent = "Error de autenticación. La app no funcionará correctamente.";
+            });
+        
+        // --- MANEJADORES DE EVENTOS (EVENT LISTENERS) ---
+
+        // Filtro: Mostrar todos
+        document.getElementById('btn-show-all').addEventListener('click', () => {
+            document.getElementById('date-filter').value = '';
+            renderEvents(allEvents);
+        });
+
+        // Filtro: Eventos para hoy
+        document.getElementById('btn-today-events').addEventListener('click', () => {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const todayString = today.toISOString().slice(0, 10);
+            document.getElementById('date-filter').value = todayString;
+            const todayEvents = allEvents.filter(event => event.date === todayString);
+            renderEvents(todayEvents);
+        });
+
+        // Filtro: Por fecha seleccionada
+        document.getElementById('date-filter').addEventListener('change', (e) => {
+            const selectedDate = e.target.value;
+            if (selectedDate) {
+                const filteredEvents = allEvents.filter(event => event.date === selectedDate);
+                renderEvents(filteredEvents);
+            } else {
+                renderEvents(allEvents);
+            }
+        });
+
+        // Cambiar vista (Ficha / Línea de tiempo)
+        document.getElementById('btn-toggle-view').addEventListener('click', (e) => {
+            isTimelineView = !isTimelineView;
+            eventsContainer.classList.toggle('grid');
+            eventsContainer.classList.toggle('timeline-view');
+            e.target.textContent = isTimelineView ? 'Ver como Fichas' : 'Ver como Línea de Tiempo';
+        });
+
+        // Abrir/Cerrar modal del formulario
+        const eventModal = document.getElementById('event-modal');
+        const newEventForm = document.getElementById('new-event-form');
+        document.getElementById('btn-open-modal').addEventListener('click', () => {
+            eventModal.classList.remove('modal-hidden');
+            eventModal.classList.add('modal-visible');
+        });
+        document.getElementById('btn-close-modal').addEventListener('click', () => {
+            eventModal.classList.add('modal-hidden');
+            eventModal.classList.remove('modal-visible');
+            newEventForm.reset();
+        });
+
+        // Enviar formulario de nuevo evento
+        newEventForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newEvent = {
+                name: document.getElementById('event-name').value,
+                date: document.getElementById('event-date').value,
+                description: document.getElementById('event-description').value,
+                imageUrl: document.getElementById('event-image-url').value,
+                creatorId: currentUserId,
+                createdAt: new Date().toISOString()
+            };
+
+            try {
+                const eventsCollection = collection(db, `artifacts/${appId}/public/data/events`);
+                await addDoc(eventsCollection, newEvent);
+                newEventForm.reset();
+                eventModal.classList.add('modal-hidden');
+                eventModal.classList.remove('modal-visible');
+            } catch (error) {
+                console.error("Error al añadir el evento: ", error);
+                alert("Hubo un error al guardar el evento.");
+            }
+        });
+
+        // Eliminar evento
+        eventsContainer.addEventListener('click', async (e) => {
+            if (e.target && e.target.classList.contains('btn-delete')) {
+                const eventId = e.target.dataset.id;
+                const userConfirmed = await showConfirmationModal("¿Estás seguro de que quieres eliminar este evento? Esta acción no se puede deshacer.");
+                if (userConfirmed) {
+                    try {
+                        const eventDocRef = doc(db, `artifacts/${appId}/public/data/events`, eventId);
+                        await deleteDoc(eventDocRef);
+                    } catch (error) {
+                        console.error("Error al eliminar el evento: ", error);
+                        alert("Hubo un error al eliminar el evento.");
+                    }
+                }
+            }
+        });
+        
+        // --- SIMULACIÓN DE WEB SCRAPING ---
+        document.getElementById('btn-simulate-scraping').addEventListener('click', async (e) => {
+            const button = e.currentTarget;
+            const spinner = document.getElementById('scraping-spinner');
+            const btnText = document.getElementById('scraping-btn-text');
+
+            button.disabled = true;
+            spinner.classList.remove('hidden');
+            btnText.textContent = 'Buscando...';
+
+            const scrapedEvents = [
+                { name: 'Cine Gratuito en el Parque', description: 'Ciclo de cine clásico al aire libre en el Parque Araucano. Trae tu manta.', imageUrl: 'https://images.unsplash.com/photo-1542204165-65bf26472b9b?q=80&w=2574' },
+                { name: 'Concierto de Jazz en Barrio Lastarria', description: 'Bandas de jazz locales se presentan en la plaza principal. No te lo pierdas.', imageUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=2670' },
+                { name: 'Exposición de Fotografía "Santiago en Blanco y Negro"', description: 'Muestra fotográfica en el Centro Cultural La Moneda.', imageUrl: 'https://images.unsplash.com/photo-1526481280643-3a0994a853b2?q=80&w=2574' },
+                { name: 'Taller de Acuarela para Principiantes', description: 'Aprende las técnicas básicas de la acuarela en la Biblioteca de Santiago.', imageUrl: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=2671' },
+                { name: 'Feria de Artesanos de Bellavista', description: 'Descubre el trabajo de artesanos locales, con música en vivo y comida.', imageUrl: 'https://images.unsplash.com/photo-1563828790324-b5a519036570?q=80&w=2670' },
+            ];
+            
+            const eventsCollection = collection(db, `artifacts/${appId}/public/data/events`);
+            
+            const today = new Date();
+            for (const event of scrapedEvents) {
+                const randomDays = Math.floor(Math.random() * 30);
+                const eventDate = new Date(today);
+                eventDate.setDate(today.getDate() + randomDays);
+                
+                const newEvent = {
+                    ...event,
+                    date: eventDate.toISOString().slice(0,10),
+                    creatorId: 'auto-scraper',
+                    createdAt: new Date().toISOString()
+                };
+                try {
+                    await addDoc(eventsCollection, newEvent);
+                } catch(error) {
+                    console.error("Error al añadir evento simulado:", error);
+                }
+            }
+
+            setTimeout(() => {
+                button.disabled = false;
+                spinner.classList.add('hidden');
+                btnText.textContent = 'Buscar Nuevos Eventos (Simulación)';
+                alert(`${scrapedEvents.length} nuevos eventos fueron añadidos!`);
+            }, 1500);
+        });
+
+        // Función para mostrar un modal de confirmación
+        const showConfirmationModal = (message) => {
+            return new Promise((resolve) => {
+                const modalHtml = `
+                    <div id="confirmation-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+                        <div class="bg-white rounded-lg p-6 shadow-xl text-center">
+                            <p class="mb-4">${message}</p>
+                            <button id="confirm-yes" class="bg-red-600 text-white px-4 py-2 rounded mr-2">Sí, eliminar</button>
+                            <button id="confirm-no" class="bg-gray-300 text-black px-4 py-2 rounded">Cancelar</button>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+                const confirmModal = document.getElementById('confirmation-modal');
+                document.getElementById('confirm-yes').onclick = () => {
+                    confirmModal.remove();
+                    resolve(true);
+                };
+                document.getElementById('confirm-no').onclick = () => {
+                    confirmModal.remove();
+                    resolve(false);
+                };
+            });
+        };
+
+    </script>
+</body>
+</html>
