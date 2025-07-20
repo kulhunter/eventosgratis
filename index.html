@@ -92,23 +92,20 @@
         <!-- Loading / Empty State -->
         <div id="loading-indicator" class="text-center py-12">
             <i class="fas fa-spinner fa-spin text-4xl text-indigo-500"></i>
-            <p class="text-lg text-gray-600 mt-4">Buscando eventos gratuitos con imagen en vivo...</p>
+            <p class="text-lg text-gray-600 mt-4">Buscando eventos gratuitos en vivo...</p>
         </div>
         <div id="no-events-message" class="hidden text-center py-16 px-6 bg-white rounded-xl shadow-lg">
             <img src="https://placehold.co/128x128/e0e7ff/6366f1?text=🤔" alt="Ícono de búsqueda" class="mx-auto rounded-full">
-            <p class="text-2xl font-bold text-gray-800 mt-6">¡Ups! No encontramos eventos gratuitos con imagen</p>
-            <p class="text-gray-500 mt-2 max-w-md mx-auto">Prueba con otros filtros o recarga la página. Los filtros de calidad son muy estrictos.</p>
+            <p class="text-2xl font-bold text-gray-800 mt-6">¡Ups! No encontramos eventos gratuitos</p>
+            <p class="text-gray-500 mt-2 max-w-md mx-auto">No hay noticias sobre eventos gratuitos en nuestras fuentes en este momento. ¡Intenta recargar la página más tarde!</p>
         </div>
     </div>
 
     <script type="module">
         // --- CONFIGURACIÓN ---
         let allEvents = [];
-        // Se usa un proxy para evitar errores de seguridad (CORS) que bloquean las peticiones
-        // desde una web de GitHub a otros sitios.
         const CORS_PROXY = "https://api.allorigins.win/raw?url=";
         
-        // Lista de fuentes RSS curadas. Son las más fiables y rápidas para un sistema sin backend.
         const sources = [
             { name: "El Mostrador Cultura", url: "https://www.elmostrador.cl/cultura/feed/", city: "Nacional" },
             { name: "ChileCultura", url: "https://chilecultura.gob.cl/agendacultural/feed", city: "Nacional" },
@@ -118,6 +115,9 @@
             { name: "BioBioChile Cultura", url: "https://www.biobiochile.cl/lista/categorias/cultura/feed", city: "Nacional" },
             { name: "Pousta", url: "https://www.pousta.com/feed/", city: "Nacional" },
             { name: "Zancada", url: "https://www.zancada.cl/feed/", city: "Nacional" },
+            { name: "La Tercera Culto", url: "https://www.latercera.com/culto/feed/", city: "Nacional"},
+            { name: "Cooperativa Cultura", url: "https://www.cooperativa.cl/noticias/cultura/rss/", city: "Nacional"},
+            { name: "Emol Espectáculos", url: "https://www.emol.com/rss/espectaculos/", city: "Nacional"}
         ];
 
         // --- REFERENCIAS AL DOM ---
@@ -133,6 +133,11 @@
             'Cine': 'bg-red-100 text-red-800', 'Teatro': 'bg-yellow-100 text-yellow-800',
             'Familia': 'bg-green-100 text-green-800', 'Aire Libre': 'bg-teal-100 text-teal-800',
             'Cultura': 'bg-gray-100 text-gray-800'
+        };
+        
+        const categoryEmojis = {
+            'Música': '🎵', 'Arte': '🎨', 'Cine': '🎬', 'Teatro': '🎭',
+            'Familia': '👨‍👩‍👧‍👦', 'Aire Libre': '🌳', 'Cultura': '🏛️'
         };
 
         // --- LÓGICA DE FILTRADO Y EXTRACCIÓN ---
@@ -187,20 +192,8 @@
                     const description = item.querySelector("description")?.textContent.replace(/<[^>]*>?/gm, '') || '';
                     const fullText = title + ' ' + description;
                     
-                    // --- FILTROS DE CALIDAD ---
                     if (!isEventFree(fullText)) {
-                        return; // DESCARTADO: No es explícitamente gratuito
-                    }
-
-                    const contentEncoded = item.querySelector("content\\:encoded")?.textContent || '';
-                    let imageUrl = null;
-                    if (contentEncoded) {
-                        const doc = parser.parseFromString(contentEncoded, 'text/html');
-                        imageUrl = doc.querySelector('img')?.src;
-                    }
-                    
-                    if (!imageUrl) {
-                        return; // DESCARTADO: No tiene imagen
+                        return; 
                     }
 
                     if (title && link) {
@@ -208,7 +201,6 @@
                         allEvents.push({
                             name: title,
                             description: description.substring(0, 150) + '...',
-                            imageUrl: imageUrl,
                             sourceUrl: link,
                             city: source.city,
                             location: extractLocation(fullText),
@@ -235,13 +227,12 @@
             noEventsMessage.classList.toggle('hidden', eventsToRender.length > 0);
             const sortedEvents = eventsToRender.sort((a, b) => new Date(a.date) - new Date(b.date));
             sortedEvents.forEach(event => {
-                const placeholderImage = `https://placehold.co/600x400/e0e7ff/6366f1?text=${encodeURIComponent(event.name)}`;
-                const imageUrl = event.imageUrl || placeholderImage;
                 const colorClass = categoryColors[event.category] || categoryColors['Cultura'];
+                const emoji = categoryEmojis[event.category] || '✨';
                 const eventCardHTML = `
                     <a href="${event.sourceUrl}" target="_blank" rel="noopener noreferrer" class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col card-hover">
-                        <div class="h-44 overflow-hidden">
-                            <img src="${imageUrl}" alt="Imagen de ${event.name}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" onerror="this.src='${placeholderImage}'">
+                        <div class="h-36 flex items-center justify-center text-6xl bg-gray-50 rounded-t-xl">
+                            ${emoji}
                         </div>
                         <div class="p-5 flex flex-col flex-grow">
                             <span class="tag ${colorClass} self-start mb-3">${event.category}</span>
