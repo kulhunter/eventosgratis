@@ -16,6 +16,100 @@
         .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
         .tag { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+        /* Estilos para el Chatbot */
+        #ai-chatbot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 320px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            overflow: hidden;
+            transform: scale(0.9);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        #ai-chatbot.open {
+            transform: scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #chatbot-header {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 15px;
+            font-weight: 600;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        #chat-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f9fafb;
+            border-bottom: 1px solid #eee;
+        }
+        .chat-message {
+            margin-bottom: 10px;
+            display: flex;
+        }
+        .chat-message.user {
+            justify-content: flex-end;
+        }
+        .chat-message.ai {
+            justify-content: flex-start;
+        }
+        .message-bubble {
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            line-height: 1.4;
+            font-size: 0.9rem;
+        }
+        .message-bubble.user {
+            background-color: #667eea;
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+        .message-bubble.ai {
+            background-color: #e2e8f0;
+            color: #2d3748;
+            border-bottom-left-radius: 2px;
+        }
+        #chat-input-container {
+            padding: 15px;
+            border-top: 1px solid #eee;
+        }
+        #chat-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            z-index: 1001;
+        }
+        #chat-button:hover {
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -27,7 +121,6 @@
     </header>
 
     <div class="container mx-auto p-4 md:p-8 -mt-16">
-        <!-- Search & Filter Panel -->
         <div class="bg-white p-6 rounded-xl shadow-2xl mb-10">
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
                 <div class="md:col-span-3 lg:col-span-2">
@@ -41,6 +134,27 @@
                         <option value="solo">Solo</option>
                         <option value="pareja">En Pareja</option>
                         <option value="grupo">En Grupo</option>
+                        <option value="familiar">Familiar</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-sm font-bold text-gray-600 block mb-2">📍 Ciudad</label>
+                    <select id="city-filter" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">Todas las ciudades</option>
+                        <option value="Santiago">Santiago</option>
+                        <option value="Valparaíso">Valparaíso</option>
+                        <option value="Concepción">Concepción</option>
+                        <option value="Nacional">Nacional</option>
+                        </select>
+                </div>
+                <div>
+                    <label class="text-sm font-bold text-gray-600 block mb-2">🗓️ Fecha</label>
+                    <select id="date-filter" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">Cualquier fecha</option>
+                        <option value="today">Hoy</option>
+                        <option value="weekend">Este Fin de Semana</option>
+                        <option value="next7days">Próximos 7 Días</option>
+                        <option value="thismonth">Este Mes</option>
                     </select>
                 </div>
                 <div>
@@ -57,10 +171,20 @@
                         <option value="-1">No especificado</option>
                     </select>
                 </div>
-                <div class="md:col-span-3 lg:col-span-1 flex items-end">
+                 <div class="md:col-span-3 lg:col-span-1 flex items-end">
+                    <div class="flex items-center">
+                        <input id="free-only-checkbox" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                        <label for="free-only-checkbox" class="ml-2 text-sm font-medium text-gray-700">Solo Gratis</label>
+                    </div>
+                </div>
+                <div class="md:col-span-2 lg:col-span-2 flex items-end">
                     <button id="search-button" class="w-full bg-indigo-600 text-white px-4 py-3 rounded-lg hover:bg-indigo-700 transition-colors font-bold text-lg">Buscar</button>
                 </div>
             </div>
+        </div>
+
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Panoramas Destacados <span id="event-count" class="text-indigo-600 ml-2 text-xl"></span></h2>
         </div>
 
         <main id="events-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -68,7 +192,7 @@
         
         <div id="loading-indicator" class="text-center py-12">
             <i class="fas fa-spinner fa-spin text-4xl text-indigo-500"></i>
-            <p class="text-lg text-gray-600 mt-4">Contactando a nuestro motor de búsqueda... Esto puede tardar un momento.</p>
+            <p class="text-lg text-gray-600 mt-4">Cargando panoramas para ti...</p>
         </div>
         <div id="no-events-message" class="hidden text-center py-16 px-6 bg-white rounded-xl shadow-lg">
             <img src="https://placehold.co/128x128/e0e7ff/6366f1?text=🤔" alt="Ícono de búsqueda" class="mx-auto rounded-full">
@@ -77,21 +201,55 @@
         </div>
     </div>
 
+    <div id="chat-button">
+        <i class="fa-solid fa-robot"></i>
+    </div>
+
+    <div id="ai-chatbot" class="hidden">
+        <div id="chatbot-header">
+            <span>Asistente Eventis AI</span>
+            <button id="close-chat-button" class="text-white text-lg"><i class="fa-solid fa-times"></i></button>
+        </div>
+        <div id="chat-messages">
+            <div class="chat-message ai">
+                <div class="message-bubble ai">
+                    ¡Hola! Soy tu asistente de Eventis. Pregúntame sobre panoramas, o dime qué te gustaría hacer.
+                </div>
+            </div>
+        </div>
+        <div id="chat-input-container">
+            <input type="text" id="chat-input" placeholder="Escribe tu pregunta aquí..." class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+    </div>
+
     <script type="module">
         // --- CONFIGURACIÓN ---
-        // URL actualizada para conectar con tu motor en Render
-        const API_URL = "https://eventis-backend-1.onrender.com/events"; 
-        
+        // !!! ASEGÚRATE DE PONER LA URL CORRECTA DE TU BACKEND EN RENDER EN LAS DOS LÍNEAS SIGUIENTES !!!
+        const API_URL = "https://eventis-backend.onrender.com/events"; // Reemplaza con tu URL real
+        const AI_RECOMMENDATION_API_URL = "https://eventis-backend.onrender.com/recommend-event-ai"; // Reemplaza con tu URL real
+
         let allEvents = [];
         const eventsContainer = document.getElementById('events-container');
         const loadingIndicator = document.getElementById('loading-indicator');
         const noEventsMessage = document.getElementById('no-events-message');
         const searchInput = document.getElementById('search-input');
         const planTypeFilter = document.getElementById('plan-type-filter');
+        const cityFilter = document.getElementById('city-filter');
+        const dateFilter = document.getElementById('date-filter');
         const budgetFilter = document.getElementById('budget-filter');
+        const freeOnlyCheckbox = document.getElementById('free-only-checkbox');
         const searchButton = document.getElementById('search-button');
+        const eventCountSpan = document.getElementById('event-count');
 
-        const planTypeEmojis = { 'solo': '👤', 'pareja': '❤️', 'grupo': '🎉', 'cualquiera': '✨' };
+        // Elementos del Chatbot
+        const chatButton = document.getElementById('chat-button');
+        const aiChatbot = document.getElementById('ai-chatbot');
+        const closeChatButton = document.getElementById('close-chat-button');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+
+
+        const planTypeEmojis = { 'solo': '👤', 'pareja': '❤️', 'grupo': '🎉', 'familiar': '👨‍👩‍👧‍👦', 'cualquiera': '✨' };
         const budgetColors = {
             0: 'bg-green-100 text-green-800', 10: 'bg-blue-100 text-blue-800',
             20: 'bg-indigo-100 text-indigo-800', 30: 'bg-purple-100 text-purple-800',
@@ -103,21 +261,69 @@
             40: '$31-$40', 50: '$41-$50', 51: '> $51', '-1': 'N/E'
         };
 
+        function isDateWithinRange(eventDateStr, range) {
+            if (!eventDateStr || eventDateStr === 'Sin fecha') return false;
+
+            const eventDate = new Date(eventDateStr + 'T00:00:00'); // Asegura que sea medianoche UTC
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Medianoche de hoy
+
+            if (isNaN(eventDate.getTime())) return false; // Fecha inválida
+
+            switch (range) {
+                case 'today':
+                    return eventDate.toDateString() === today.toDateString();
+                case 'weekend':
+                    const nextSaturday = new Date(today);
+                    nextSaturday.setDate(today.getDate() + (6 - today.getDay() + 7) % 7); // Próximo sábado
+                    nextSaturday.setHours(0,0,0,0);
+
+                    const nextSunday = new Date(nextSaturday);
+                    nextSunday.setDate(nextSaturday.getDate() + 1); // Domingo
+
+                    return eventDate >= nextSaturday && eventDate <= nextSunday;
+
+                case 'next7days':
+                    const sevenDaysFromNow = new Date(today);
+                    sevenDaysFromNow.setDate(today.getDate() + 7);
+                    return eventDate >= today && eventDate <= sevenDaysFromNow;
+                case 'thismonth':
+                    return eventDate.getMonth() === today.getMonth() && eventDate.getFullYear() === today.getFullYear();
+                default:
+                    return true;
+            }
+        }
+
         function applyFilters() {
             const searchTerm = searchInput.value.toLowerCase();
             const planType = planTypeFilter.value;
+            const city = cityFilter.value;
+            const dateRange = dateFilter.value;
             const budget = budgetFilter.value;
+            const freeOnly = freeOnlyCheckbox.checked;
 
             let filteredEvents = allEvents;
 
             if (searchTerm) {
-                filteredEvents = filteredEvents.filter(e => e.name.toLowerCase().includes(searchTerm));
+                filteredEvents = filteredEvents.filter(e => 
+                    e.name.toLowerCase().includes(searchTerm) || 
+                    e.description.toLowerCase().includes(searchTerm)
+                );
             }
             if (planType) {
                 filteredEvents = filteredEvents.filter(e => e.planType === planType);
             }
+            if (city) {
+                filteredEvents = filteredEvents.filter(e => e.location.toLowerCase().includes(city.toLowerCase()));
+            }
+            if (dateRange) {
+                filteredEvents = filteredEvents.filter(e => isDateWithinRange(e.date, dateRange));
+            }
             if (budget) {
                 filteredEvents = filteredEvents.filter(e => e.budget.toString() === budget);
+            }
+            if (freeOnly) {
+                filteredEvents = filteredEvents.filter(e => e.budget === 0);
             }
             
             renderEvents(filteredEvents);
@@ -125,15 +331,21 @@
 
         function renderEvents(eventsToRender) {
             eventsContainer.innerHTML = '';
-            noEventsMessage.classList.toggle('hidden', eventsToRender.length === 0);
+            eventCountSpan.textContent = `(${eventsToRender.length} encontrados)`;
+            noEventsMessage.classList.toggle('hidden', eventsToRender.length > 0);
             
-            const sortedEvents = eventsToRender.sort((a, b) => new Date(a.date) - new Date(b.date));
+            const sortedEvents = eventsToRender.sort((a, b) => {
+                const dateA = a.date === 'Sin fecha' ? new Date('2100-01-01') : new Date(a.date);
+                const dateB = b.date === 'Sin fecha' ? new Date('2100-01-01') : new Date(b.date);
+                return dateA - dateB;
+            });
             
             sortedEvents.forEach(event => {
                 const emoji = planTypeEmojis[event.planType] || '✨';
                 const budgetLabel = budgetLabels[event.budget];
                 const budgetColor = budgetColors[event.budget];
-                const placeholderImage = `https://placehold.co/600x400/e0e7ff/6366f1?text=${encodeURIComponent(event.name)}`;
+                const placeholderText = encodeURIComponent(event.name.substring(0, 20)).replace(/%20/g, '+'); // Encode for URL, replace spaces
+                const placeholderImage = `https://placehold.co/600x400/e0e7ff/6366f1?text=${placeholderText}`;
                 const imageUrl = event.imageUrl || placeholderImage;
 
                 const eventCardHTML = `
@@ -147,12 +359,13 @@
                                 <span class="text-2xl">${emoji}</span>
                             </div>
                             <h3 class="text-lg font-bold text-gray-900 leading-tight flex-grow mb-3">${event.name}</h3>
+                            <p class="text-sm text-gray-600 mb-3">${event.description}</p>
                             <div class="mt-auto space-y-2 text-sm text-gray-600">
-                                <p class="flex items-center"><i class="fa-solid fa-calendar-alt mr-3 w-4 text-center text-gray-400"></i>${new Date(event.date + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}</p>
-                                <p class="flex items-center"><i class="fa-solid fa-map-marker-alt mr-3 w-4 text-center text-gray-400"></i>${event.city}</p>
+                                <p class="flex items-center"><i class="fa-solid fa-calendar-alt mr-3 w-4 text-center text-gray-400"></i>${event.date === 'Sin fecha' ? 'Sin fecha' : new Date(event.date + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                                <p class="flex items-center"><i class="fa-solid fa-map-marker-alt mr-3 w-4 text-center text-gray-400"></i>${event.location}</p>
                             </div>
                             <div class="mt-5 pt-4 border-t border-gray-200 text-xs text-gray-400">
-                               Fuente: ${new URL(event.sourceUrl).hostname}
+                                Fuente: ${new URL(event.sourceUrl).hostname}
                             </div>
                         </div>
                     </a>`;
@@ -164,8 +377,76 @@
         searchInput.addEventListener('keyup', (e) => {
             if (e.key === 'Enter') applyFilters();
         });
+        planTypeFilter.addEventListener('change', applyFilters);
+        cityFilter.addEventListener('change', applyFilters);
+        dateFilter.addEventListener('change', applyFilters);
+        budgetFilter.addEventListener('change', applyFilters);
+        freeOnlyCheckbox.addEventListener('change', applyFilters);
 
 
+        // --- Chatbot Logic ---
+        chatButton.addEventListener('click', () => {
+            aiChatbot.classList.toggle('hidden');
+            aiChatbot.classList.toggle('open');
+            if (!aiChatbot.classList.contains('hidden')) {
+                chatInput.focus();
+                chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to bottom
+            }
+        });
+
+        closeChatButton.addEventListener('click', () => {
+            aiChatbot.classList.add('hidden');
+            aiChatbot.classList.remove('open');
+        });
+
+        chatInput.addEventListener('keyup', async (e) => {
+            if (e.key === 'Enter' && chatInput.value.trim() !== '') {
+                const userMessage = chatInput.value.trim();
+                appendMessage(userMessage, 'user');
+                chatInput.value = ''; // Clear input
+
+                const loadingBubble = appendMessage('Escribiendo...', 'ai'); // Mensaje de "Escribiendo..."
+                loadingBubble.classList.add('loading-dots');
+
+                try {
+                    const response = await fetch(AI_RECOMMENDATION_API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            question: userMessage, 
+                            currentEvents: allEvents // Send all loaded events to AI for context
+                        }),
+                    });
+
+                    if (!response.ok) throw new Error('Error al conectar con la IA de recomendación.');
+                    const data = await response.json();
+                    
+                    chatMessages.removeChild(loadingBubble.closest('.chat-message')); // Remove loading indicator
+
+                    appendMessage(data.recommendation, 'ai');
+                } catch (error) {
+                    console.error("Error en el chatbot:", error);
+                    chatMessages.removeChild(loadingBubble.closest('.chat-message')); // Remove loading indicator
+                    appendMessage("Lo siento, no puedo ayudarte con eso ahora mismo. Hubo un error al generar la recomendación.", 'ai');
+                }
+            }
+        });
+
+        function appendMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chat-message', sender);
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.classList.add('message-bubble', sender);
+            bubbleDiv.textContent = text;
+            messageDiv.appendChild(bubbleDiv);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to bottom
+            return bubbleDiv; // Return bubble for easy removal/modification
+        }
+
+        // --- Inicialización ---
         async function initialize() {
             try {
                 const response = await fetch(API_URL);
@@ -185,6 +466,8 @@
                 console.error("Error al cargar eventos:", error);
                 loadingIndicator.classList.add('hidden');
                 noEventsMessage.classList.remove('hidden');
+                noEventsMessage.querySelector('p:first-of-type').textContent = "¡Hubo un error al cargar los panoramas!";
+                noEventsMessage.querySelector('p:last-of-type').textContent = "Por favor, inténtalo de nuevo más tarde o contacta al soporte.";
             }
         }
 
