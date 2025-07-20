@@ -4,47 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agregador Nacional de Eventos Gratuitos</title>
-    
-    <!-- Tailwind CSS para el diseño -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .modal-hidden { display: none; opacity: 0; }
-        .modal-visible { display: flex; opacity: 1; transition: opacity 0.3s ease; }
-        .spinner { border: 4px solid rgba(0, 0, 0, 0.1); width: 24px; height: 24px; border-radius: 50%; border-left-color: #fff; animation: spin 1s ease infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .tag {
-            display: inline-block;
-            padding: 0.25rem 0.6rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        .modal-hidden { display: none; }
+        .modal-visible { display: flex; }
+        .tag { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; text-transform: uppercase; }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
-
-    <!-- Contenedor principal -->
     <div class="container mx-auto p-4 md:p-8">
-
         <header class="text-center mb-8">
             <h1 class="text-4xl md:text-5xl font-bold text-indigo-600">Agenda Nacional de Eventos</h1>
             <p class="text-gray-600 mt-2">Tu portal centralizado para descubrir eventos gratuitos en todo el país.</p>
         </header>
-
-        <!-- Controles y Filtros Avanzados -->
         <div class="bg-white p-4 rounded-lg shadow-md mb-8 flex flex-wrap items-center justify-center gap-4 md:gap-6">
-            <!-- Filtro por Ciudad -->
             <div class="flex items-center gap-2">
                 <label for="city-filter" class="text-sm font-medium"><i class="fa-solid fa-map-marker-alt mr-1"></i>Ciudad:</label>
                 <select id="city-filter" class="border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
@@ -54,7 +32,6 @@
                     <option value="Concepción">Concepción</option>
                 </select>
             </div>
-             <!-- Filtro por Categoría -->
             <div class="flex items-center gap-2">
                 <label for="category-filter" class="text-sm font-medium"><i class="fa-solid fa-tag mr-1"></i>Categoría:</label>
                 <select id="category-filter" class="border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
@@ -64,99 +41,28 @@
                     <option value="Cine">Cine</option>
                     <option value="Teatro">Teatro</option>
                     <option value="Familia">Familia</option>
+                    <option value="Aire Libre">Aire Libre</option>
                 </select>
             </div>
-            <!-- Filtro por Fecha -->
             <div class="flex items-center gap-2">
                 <label for="date-filter" class="text-sm font-medium"><i class="fa-solid fa-calendar-alt mr-1"></i>Fecha:</label>
                 <input type="date" id="date-filter" class="border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
             </div>
             <button id="btn-clear-filters" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors">Limpiar Filtros</button>
         </div>
-        
-        <!-- Botón de Scraping Simulado -->
-        <div class="text-center mb-8">
-             <button id="btn-simulate-scraping" class="bg-cyan-500 text-white px-6 py-3 rounded-lg hover:bg-cyan-600 transition-colors flex items-center justify-center gap-2 mx-auto disabled:bg-cyan-300">
-                <i class="fa-solid fa-robot"></i>
-                <span id="scraping-btn-text">Nutrir Base de Datos (Simulación)</span>
-                <div id="scraping-spinner" class="spinner hidden"></div>
-            </button>
-        </div>
-
-        <!-- Contenedor de Eventos -->
         <main id="events-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Las fichas de eventos se insertarán aquí -->
         </main>
         <div id="loading-indicator" class="text-center py-12">
             <p class="text-lg text-gray-500">Conectando con la base de datos...</p>
         </div>
         <div id="no-events-message" class="hidden text-center py-12 bg-white rounded-lg shadow-md">
             <p class="text-xl font-semibold text-gray-700">No se encontraron eventos con los filtros actuales</p>
-            <p class="text-gray-500 mt-2">Prueba a cambiar los filtros o a nutrir la base de datos.</p>
-        </div>
-
-    </div>
-
-    <!-- Botón flotante para añadir evento -->
-    <button id="btn-open-modal" class="fixed bottom-8 right-8 bg-indigo-600 text-white w-16 h-16 rounded-full shadow-lg flex items-center justify-center text-3xl hover:bg-indigo-700 transition-transform transform hover:scale-110">
-        +
-    </button>
-
-    <!-- Modal para el formulario de nuevo evento -->
-    <div id="event-modal" class="modal-hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg">
-            <h2 class="text-2xl font-bold mb-6">Cargar Nuevo Evento Manualmente</h2>
-            <form id="new-event-form">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="mb-4">
-                        <label for="event-name" class="block text-sm font-medium text-gray-700">Nombre del Evento</label>
-                        <input type="text" id="event-name" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="event-date" class="block text-sm font-medium text-gray-700">Fecha</label>
-                        <input type="date" id="event-date" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
-                    </div>
-                     <div class="mb-4">
-                        <label for="event-city" class="block text-sm font-medium text-gray-700">Ciudad</label>
-                        <select id="event-city" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
-                            <option value="Santiago">Santiago</option>
-                            <option value="Valparaíso">Valparaíso</option>
-                            <option value="Concepción">Concepción</option>
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label for="event-category" class="block text-sm font-medium text-gray-700">Categoría</label>
-                        <select id="event-category" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
-                            <option value="Música">Música</option>
-                            <option value="Arte">Arte</option>
-                            <option value="Cine">Cine</option>
-                            <option value="Teatro">Teatro</option>
-                            <option value="Familia">Familia</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <label for="event-description" class="block text-sm font-medium text-gray-700">Descripción</label>
-                    <textarea id="event-description" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required></textarea>
-                </div>
-                <div class="mb-4">
-                    <label for="event-image-url" class="block text-sm font-medium text-gray-700">URL de la Imagen (Opcional)</label>
-                    <input type="url" id="event-image-url" placeholder="https://ejemplo.com/imagen.jpg" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                </div>
-                <div class="flex justify-end gap-4 mt-8">
-                    <button type="button" id="btn-close-modal" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">Cancelar</button>
-                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Guardar Evento</button>
-                </div>
-            </form>
+            <p class="text-gray-500 mt-2">Prueba a cambiar los filtros.</p>
         </div>
     </div>
-
-    <!-- Firebase y Lógica de la Aplicación -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-
+        import { getFirestore, collection, onSnapshot, query } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyCaErRFWD_Z9UgE0bBoblY-H9_zKh-vSII",
             authDomain: "appeventos-de195.firebaseapp.com",
@@ -166,201 +72,73 @@
             appId: "1:176519875945:web:aa5d3e2e14f3231e8ac1f8",
             measurementId: "G-WJRS95EX7B"
         };
-        
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const auth = getAuth(app);
         const appId = firebaseConfig.projectId;
-
         let allEvents = [];
-        let currentUserId = null;
-        
         const eventsContainer = document.getElementById('events-container');
         const loadingIndicator = document.getElementById('loading-indicator');
         const noEventsMessage = document.getElementById('no-events-message');
-        
         const cityFilter = document.getElementById('city-filter');
         const categoryFilter = document.getElementById('category-filter');
         const dateFilter = document.getElementById('date-filter');
-
         const categoryColors = {
-            'Música': 'bg-blue-100 text-blue-800',
-            'Arte': 'bg-purple-100 text-purple-800',
-            'Cine': 'bg-red-100 text-red-800',
-            'Teatro': 'bg-yellow-100 text-yellow-800',
-            'Familia': 'bg-green-100 text-green-800',
+            'Música': 'bg-blue-100 text-blue-800', 'Arte': 'bg-purple-100 text-purple-800',
+            'Cine': 'bg-red-100 text-red-800', 'Teatro': 'bg-yellow-100 text-yellow-800',
+            'Familia': 'bg-green-100 text-green-800', 'Aire Libre': 'bg-teal-100 text-teal-800',
             'Default': 'bg-gray-100 text-gray-800'
         };
-
         const applyFilters = () => {
-            const city = cityFilter.value;
-            const category = categoryFilter.value;
-            const date = dateFilter.value;
-
             let filteredEvents = allEvents;
-
-            if (city) {
-                filteredEvents = filteredEvents.filter(event => event.city === city);
-            }
-            if (category) {
-                filteredEvents = filteredEvents.filter(event => event.category === category);
-            }
-            if (date) {
-                filteredEvents = filteredEvents.filter(event => event.date === date);
-            }
+            if (cityFilter.value) filteredEvents = filteredEvents.filter(e => e.city === cityFilter.value);
+            if (categoryFilter.value) filteredEvents = filteredEvents.filter(e => e.category === categoryFilter.value);
+            if (dateFilter.value) filteredEvents = filteredEvents.filter(e => e.date === dateFilter.value);
             renderEvents(filteredEvents);
         };
-
         const renderEvents = (eventsToRender) => {
             eventsContainer.innerHTML = '';
             noEventsMessage.classList.toggle('hidden', eventsToRender.length > 0);
-            
             const sortedEvents = eventsToRender.sort((a, b) => new Date(a.date) - new Date(b.date));
-
             sortedEvents.forEach(event => {
                 const placeholderImage = `https://placehold.co/600x400/e0e7ff/4f46e5?text=${encodeURIComponent(event.name)}`;
                 const imageUrl = event.imageUrl || placeholderImage;
                 const colorClass = categoryColors[event.category] || categoryColors['Default'];
-
                 const eventCardHTML = `
-                    <article class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col transition-transform transform hover:-translate-y-1">
+                    <a href="${event.sourceUrl}" target="_blank" class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col transition-transform transform hover:-translate-y-1 hover:shadow-xl">
                         <img src="${imageUrl}" alt="Imagen de ${event.name}" class="w-full h-40 object-cover" onerror="this.src='${placeholderImage}'">
                         <div class="p-4 flex flex-col flex-grow">
                             <div class="mb-2 flex justify-between items-start">
-                                <h3 class="text-lg font-bold text-gray-900">${event.name}</h3>
-                                <span class="tag ${colorClass}">${event.category}</span>
+                                <h3 class="text-lg font-bold text-gray-900 leading-tight">${event.name}</h3>
+                                <span class="tag ${colorClass} flex-shrink-0 ml-2">${event.category}</span>
                             </div>
-                            <p class="text-sm text-gray-500 mb-2 flex items-center"><i class="fa-solid fa-map-marker-alt mr-2"></i>${event.city}</p>
-                            <p class="text-sm text-gray-600 font-semibold mb-3 flex items-center"><i class="fa-solid fa-calendar-alt mr-2"></i>${new Date(event.date + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+                            <p class="text-sm text-gray-500 mb-2 flex items-center"><i class="fa-solid fa-map-marker-alt mr-2 text-gray-400"></i>${event.city}</p>
+                            <p class="text-sm text-gray-600 font-semibold mb-3 flex items-center"><i class="fa-solid fa-calendar-alt mr-2 text-gray-400"></i>${new Date(event.date + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                             <p class="text-sm text-gray-600 flex-grow mb-4">${event.description}</p>
-                            <div class="mt-auto pt-3 border-t border-gray-200 flex justify-between items-center">
-                               <span class="text-xs text-gray-400">ID: ${event.creatorId === 'auto-scraper' ? 'Automático' : event.creatorId.substring(0, 6)}</span>
-                               ${event.creatorId === currentUserId ? `<button data-id="${event.id}" class="btn-delete text-red-400 hover:text-red-600 text-xs font-semibold">ELIMINAR</button>` : ''}
+                            <div class="mt-auto pt-3 border-t border-gray-200 text-xs text-gray-400">
+                               Fuente: ${new URL(event.sourceUrl).hostname}
                             </div>
                         </div>
-                    </article>
-                `;
+                    </a>`;
                 eventsContainer.insertAdjacentHTML('beforeend', eventCardHTML);
             });
         };
-
-        signInAnonymously(auth).then((result) => {
-            currentUserId = result.user.uid;
-            const eventsCollection = collection(db, `artifacts/${appId}/public/data/events`);
-            onSnapshot(query(eventsCollection), (snapshot) => {
-                loadingIndicator.classList.add('hidden');
-                allEvents = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                applyFilters();
-            }, (error) => {
-                console.error("Error al obtener eventos: ", error);
-                loadingIndicator.textContent = "Error al cargar los eventos.";
-            });
-        }).catch((error) => {
-            console.error("Error de autenticación anónima:", error);
-            loadingIndicator.textContent = "Error de autenticación. La app no funcionará correctamente.";
+        const eventsCollection = collection(db, `artifacts/${appId}/public/data/events`);
+        onSnapshot(query(eventsCollection), (snapshot) => {
+            loadingIndicator.classList.add('hidden');
+            allEvents = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            applyFilters();
+        }, (error) => {
+            console.error("Error al obtener eventos: ", error);
+            loadingIndicator.textContent = "Error al cargar los eventos.";
         });
-        
         cityFilter.addEventListener('change', applyFilters);
         categoryFilter.addEventListener('change', applyFilters);
         dateFilter.addEventListener('change', applyFilters);
-
         document.getElementById('btn-clear-filters').addEventListener('click', () => {
             cityFilter.value = '';
             categoryFilter.value = '';
             dateFilter.value = '';
             applyFilters();
-        });
-        
-        const eventModal = document.getElementById('event-modal');
-        const newEventForm = document.getElementById('new-event-form');
-        document.getElementById('btn-open-modal').addEventListener('click', () => eventModal.classList.replace('modal-hidden', 'modal-visible'));
-        document.getElementById('btn-close-modal').addEventListener('click', () => eventModal.classList.replace('modal-visible', 'modal-hidden'));
-
-        newEventForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const newEvent = {
-                name: document.getElementById('event-name').value,
-                date: document.getElementById('event-date').value,
-                city: document.getElementById('event-city').value,
-                category: document.getElementById('event-category').value,
-                description: document.getElementById('event-description').value,
-                imageUrl: document.getElementById('event-image-url').value,
-                creatorId: currentUserId,
-                createdAt: new Date().toISOString()
-            };
-            try {
-                await addDoc(collection(db, `artifacts/${appId}/public/data/events`), newEvent);
-                newEventForm.reset();
-                eventModal.classList.replace('modal-visible', 'modal-hidden');
-            } catch (error) {
-                console.error("Error al añadir el evento: ", error);
-            }
-        });
-
-        eventsContainer.addEventListener('click', async (e) => {
-            if (e.target.classList.contains('btn-delete')) {
-                const eventId = e.target.dataset.id;
-                if (confirm("¿Estás seguro de que quieres eliminar este evento?")) {
-                    await deleteDoc(doc(db, `artifacts/${appId}/public/data/events`, eventId));
-                }
-            }
-        });
-        
-        document.getElementById('btn-simulate-scraping').addEventListener('click', async (e) => {
-            const button = e.currentTarget;
-            const spinner = document.getElementById('scraping-spinner');
-            const btnText = document.getElementById('scraping-btn-text');
-
-            button.disabled = true;
-            spinner.classList.remove('hidden');
-            btnText.textContent = 'Nutriendo...';
-
-            const sampleData = [
-                { n: 'Festival de Teatro Callejero', c: 'Teatro', city: 'Valparaíso' }, { n: 'Ciclo de Cine Francés', c: 'Cine', city: 'Santiago' },
-                { n: 'Concierto Sinfónico al Aire Libre', c: 'Música', city: 'Concepción' }, { n: 'Feria de Arte y Diseño Local', c: 'Arte', city: 'Santiago' },
-                { n: 'Taller de Marionetas para Niños', c: 'Familia', city: 'Valparaíso' }, { n: 'Noche de Jazz & Blues', c: 'Música', city: 'Santiago' },
-                { n: 'Exposición de Esculturas Modernas', c: 'Arte', city: 'Concepción' }, { n: 'Ciclo de Cine de Terror Clásico', c: 'Cine', city: 'Valparaíso' },
-                { n: 'Obra "La Casa de Bernarda Alba"', c: 'Teatro', city: 'Santiago' }, { n: 'Día de Juegos y Picnic Familiar', c: 'Familia', city: 'Concepción' },
-                { n: 'Concierto de Bandas Emergentes', c: 'Música', city: 'Valparaíso' }, { n: 'Muestra de Arte Urbano', c: 'Arte', city: 'Santiago' },
-                { n: 'Festival de Cortometrajes Chilenos', c: 'Cine', city: 'Concepción' }, { n: 'Show de Magia e Ilusionismo', c: 'Familia', city: 'Santiago' },
-                { n: 'Taller de Cerámica Raku', c: 'Arte', city: 'Valparaíso' }, { n: 'Concierto Tributo a Queen', c: 'Música', city: 'Concepción' },
-                { n: 'Maratón de Películas de Studio Ghibli', c: 'Cine', city: 'Santiago' }, { n: 'Teatro de Improvisación', c: 'Teatro', city: 'Valparaíso' },
-                { n: 'Feria Gastronómica Multicultural', c: 'Familia', city: 'Concepción' }, { n: 'Exposición "Fotógrafos del Siglo XX"', c: 'Arte', city: 'Santiago' },
-                { n: 'Concierto de Coros Polifónicos', c: 'Música', city: 'Valparaíso' }, { n: 'Cine Infantil: Clásicos de Disney', c: 'Familia', city: 'Santiago' },
-                { n: 'Recital de Poesía y Música', c: 'Arte', city: 'Concepción' }, { n: 'Stand-up Comedy en el Bar', c: 'Teatro', city: 'Santiago' },
-                { n: 'Taller de Huertos Urbanos', c: 'Familia', city: 'Valparaíso' }, { n: 'Concierto de Rock Latino', c: 'Música', city: 'Concepción' },
-                { n: 'Muestra de Documentales Sociales', c: 'Cine', city: 'Santiago' }, { n: 'Performance de Danza Contemporánea', c: 'Teatro', city: 'Valparaíso' },
-                { n: 'Feria de Adopción de Mascotas', c: 'Familia', city: 'Concepción' }, { n: 'Pintura en Vivo con Artistas Locales', c: 'Arte', city: 'Santiago' }
-            ];
-            
-            const eventsCollection = collection(db, `artifacts/${appId}/public/data/events`);
-            const today = new Date();
-            
-            for (const event of sampleData) {
-                const randomDays = Math.floor(Math.random() * 60);
-                const eventDate = new Date(today);
-                eventDate.setDate(today.getDate() + randomDays);
-                
-                const newEvent = {
-                    name: event.n,
-                    category: event.c,
-                    city: event.city,
-                    date: eventDate.toISOString().slice(0,10),
-                    description: `Evento de ${event.c} en ${event.city}. Una oportunidad única para disfrutar de la cultura local.`,
-                    creatorId: 'auto-scraper',
-                    createdAt: new Date().toISOString()
-                };
-                try {
-                    await addDoc(eventsCollection, newEvent);
-                } catch(error) { console.error("Error al añadir evento simulado:", error); }
-            }
-
-            setTimeout(() => {
-                button.disabled = false;
-                spinner.classList.add('hidden');
-                btnText.textContent = 'Nutrir Base de Datos (Simulación)';
-                alert(`${sampleData.length} nuevos eventos simulados fueron añadidos a la base de datos.`);
-            }, 1000);
         });
     </script>
 </body>
