@@ -3,48 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agregador Nacional de Eventos Gratuitos</title>
+    <title>Eventis | Tu Agenda de Eventos Gratuitos en Chile</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Encuentra los mejores panoramas y eventos gratuitos en todo Chile. Conciertos, arte, teatro, cine y más, actualizados automáticamente cada hora.">
+    <meta name="keywords" content="eventos gratis, panoramas, chile, santiago, valparaíso, concepción, conciertos, cultura, gratis, agenda cultural">
+    <meta name="author" content="Eventis">
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <style>
-        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
-        .tag { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; text-transform: uppercase; }
+        body { font-family: 'Poppins', sans-serif; scroll-behavior: smooth; background-color: #f0f2f5; }
+        .hero-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+        .tag { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .bot-fab { position: fixed; bottom: 2rem; right: 2rem; z-index: 40; }
         .bot-modal {
-            position: fixed;
-            bottom: 6.5rem;
-            right: 2rem;
-            width: 350px;
-            height: 450px;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            transform: scale(0.5);
-            transform-origin: bottom right;
-            opacity: 0;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-            z-index: 40;
-            display: flex;
-            flex-direction: column;
+            position: fixed; bottom: 6.5rem; right: 2rem; width: 350px; height: 450px;
+            border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transform: scale(0.5); transform-origin: bottom right; opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease; z-index: 40;
+            display: flex; flex-direction: column;
         }
         .bot-modal.visible { transform: scale(1); opacity: 1; }
-        .chat-bubble { max-width: 85%; }
-        .chat-bubble.bot { background-color: #e5e7eb; align-self: flex-start; }
-        .chat-bubble.user { background-color: #4f46e5; color: white; align-self: flex-end; }
+        .chat-bubble { max-width: 85%; padding: 0.75rem 1rem; border-radius: 1rem; line-height: 1.4; }
+        .chat-bubble.bot { background-color: #e5e7eb; align-self: flex-start; border-bottom-left-radius: 0.25rem; }
+        .chat-bubble.user { background-color: #4f46e5; color: white; align-self: flex-end; border-bottom-right-radius: 0.25rem; }
     </style>
+
+    <!-- JSON-LD Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Eventis",
+      "url": "https://kulhunter.github.io/eventosgratis/",
+      "description": "Tu Agenda de Eventos Gratuitos en Chile",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://kulhunter.github.io/eventosgratis/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
 </head>
-<body class="bg-gray-100 text-gray-800">
-    <div class="container mx-auto p-4 md:p-8">
-        <header class="text-center mb-8">
-            <h1 class="text-4xl md:text-5xl font-bold text-indigo-600">Agenda Nacional de Eventos</h1>
-            <p class="text-gray-600 mt-2">Tu portal para descubrir eventos gratuitos en todo Chile, actualizado automáticamente.</p>
-        </header>
-        <div class="bg-white p-4 rounded-lg shadow-md mb-8 flex flex-wrap items-center justify-center gap-4 md:gap-6">
+<body class="antialiased">
+    <!-- Header -->
+    <header class="hero-gradient text-white py-12 sm:py-20">
+        <div class="container mx-auto px-6 text-center">
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">Descubre Eventos Increíbles ✨</h1>
+            <p class="mt-4 text-lg sm:text-xl text-indigo-200 max-w-3xl mx-auto">Tu portal para encontrar panoramas gratuitos en todo Chile. La cultura te espera, ¡sal a buscarla!</p>
+        </div>
+    </header>
+
+    <div class="container mx-auto p-4 md:p-8 -mt-10">
+        <!-- Filter Controls -->
+        <div class="bg-white p-4 rounded-xl shadow-lg mb-10 flex flex-wrap items-center justify-center gap-4 md:gap-6">
             <div class="flex items-center gap-2">
-                <label for="city-filter" class="text-sm font-medium"><i class="fa-solid fa-map-marker-alt mr-1"></i>Ciudad:</label>
-                <select id="city-filter" class="border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                <label for="city-filter" class="text-sm font-medium text-gray-600"><i class="fa-solid fa-map-marker-alt mr-1 text-indigo-500"></i>Ciudad</label>
+                <select id="city-filter" class="border-gray-200 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
                     <option value="">Todas</option>
                     <option value="Santiago">Santiago</option>
                     <option value="Valparaíso">Valparaíso</option>
@@ -52,54 +79,60 @@
                 </select>
             </div>
             <div class="flex items-center gap-2">
-                <label for="category-filter" class="text-sm font-medium"><i class="fa-solid fa-tag mr-1"></i>Categoría:</label>
-                <select id="category-filter" class="border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                <label for="category-filter" class="text-sm font-medium text-gray-600"><i class="fa-solid fa-tag mr-1 text-indigo-500"></i>Categoría</label>
+                <select id="category-filter" class="border-gray-200 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
                     <option value="">Todas</option>
-                    <option value="Música">Música</option>
-                    <option value="Arte">Arte</option>
-                    <option value="Cine">Cine</option>
-                    <option value="Teatro">Teatro</option>
-                    <option value="Familia">Familia</option>
-                    <option value="Aire Libre">Aire Libre</option>
+                    <option value="Música">Música 🎵</option>
+                    <option value="Arte">Arte 🎨</option>
+                    <option value="Cine">Cine 🎬</option>
+                    <option value="Teatro">Teatro 🎭</option>
+                    <option value="Familia">Familia 👨‍👩‍👧‍👦</option>
+                    <option value="Aire Libre">Aire Libre 🌳</option>
                 </select>
             </div>
             <div class="flex items-center gap-2">
-                <label for="date-filter" class="text-sm font-medium"><i class="fa-solid fa-calendar-alt mr-1"></i>Fecha:</label>
-                <input type="date" id="date-filter" class="border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                <label for="date-filter" class="text-sm font-medium text-gray-600"><i class="fa-solid fa-calendar-alt mr-1 text-indigo-500"></i>Fecha</label>
+                <input type="date" id="date-filter" class="border-gray-200 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
             </div>
-            <button id="btn-clear-filters" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors">Limpiar Filtros</button>
+            <button id="btn-clear-filters" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm font-semibold">Limpiar</button>
         </div>
-        <main id="events-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+        <!-- Events Grid -->
+        <main id="events-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         </main>
+
+        <!-- Loading / Empty State -->
         <div id="loading-indicator" class="text-center py-12">
-            <p class="text-lg text-gray-500">Buscando eventos en la base de datos...</p>
+            <i class="fas fa-spinner fa-spin text-4xl text-indigo-500"></i>
+            <p class="text-lg text-gray-600 mt-4">Buscando los mejores panoramas...</p>
         </div>
-        <div id="no-events-message" class="hidden text-center py-12 bg-white rounded-lg shadow-md">
-            <p class="text-xl font-semibold text-gray-700">No se encontraron eventos con los filtros actuales</p>
-            <p class="text-gray-500 mt-2">Prueba a cambiar los filtros. El sistema se actualiza automáticamente cada hora.</p>
+        <div id="no-events-message" class="hidden text-center py-16 px-6 bg-white rounded-xl shadow-lg">
+            <img src="https://placehold.co/128x128/e0e7ff/6366f1?text=🤔" alt="Ícono de búsqueda" class="mx-auto rounded-full">
+            <p class="text-2xl font-bold text-gray-800 mt-6">¡Ups! No encontramos eventos</p>
+            <p class="text-gray-500 mt-2 max-w-md mx-auto">Prueba con otros filtros o vuelve más tarde. Nuestro robot busca nuevos eventos cada hora. ¡Seguro pronto aparecerá algo para ti!</p>
         </div>
     </div>
 
-    <!-- Asesor IA Flotante -->
+    <!-- AI Assistant FAB -->
     <div class="bot-fab">
-        <button id="bot-toggle-button" class="bg-indigo-600 text-white w-16 h-16 rounded-full shadow-lg flex items-center justify-center text-2xl hover:bg-indigo-700 transition-transform transform hover:scale-110">
+        <button id="bot-toggle-button" class="bg-indigo-600 text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center text-2xl hover:bg-indigo-700 transition-all duration-300 transform hover:scale-110 hover:rotate-12">
             <i class="fa-solid fa-robot"></i>
         </button>
     </div>
     <div id="bot-modal" class="bot-modal bg-white overflow-hidden">
-        <div class="bg-indigo-600 text-white p-4 text-center font-bold">Asesor de Eventos IA</div>
-        <div id="chat-window" class="flex-grow p-4 flex flex-col gap-3 overflow-y-auto">
-            <!-- Mensajes del chat se insertan aquí -->
-        </div>
-        <div id="bot-actions" class="p-2 border-t border-gray-200">
-            <button id="suggest-event-button" class="w-full bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition-colors text-sm">
-                Búscame un evento para hoy
+        <div class="bg-indigo-600 text-white p-4 text-center font-bold shadow-md">Asesor de Eventos IA</div>
+        <div id="chat-window" class="flex-grow p-4 flex flex-col gap-3 overflow-y-auto"></div>
+        <div id="bot-actions" class="p-3 border-t border-gray-200 bg-gray-50">
+            <button id="suggest-event-button" class="w-full bg-indigo-500 text-white px-4 py-2.5 rounded-lg hover:bg-indigo-600 transition-colors text-sm font-semibold flex items-center justify-center gap-2">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span>Sorpréndeme para hoy</span>
             </button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
         
         const firebaseConfig = {
@@ -114,6 +147,7 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
         const appId = firebaseConfig.projectId;
         let allEvents = [];
 
@@ -144,21 +178,22 @@
             noEventsMessage.classList.toggle('hidden', eventsToRender.length > 0);
             const sortedEvents = eventsToRender.sort((a, b) => new Date(a.date) - new Date(b.date));
             sortedEvents.forEach(event => {
-                const placeholderImage = `https://placehold.co/600x400/e0e7ff/4f46e5?text=${encodeURIComponent(event.name)}`;
+                const placeholderImage = `https://placehold.co/600x400/e0e7ff/6366f1?text=${encodeURIComponent(event.name)}`;
                 const imageUrl = event.imageUrl || placeholderImage;
                 const colorClass = categoryColors[event.category] || categoryColors['Default'];
                 const eventCardHTML = `
-                    <a href="${event.sourceUrl}" target="_blank" rel="noopener noreferrer" class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col transition-transform transform hover:-translate-y-1 hover:shadow-xl">
-                        <img src="${imageUrl}" alt="Imagen de ${event.name}" class="w-full h-40 object-cover" onerror="this.src='${placeholderImage}'">
-                        <div class="p-4 flex flex-col flex-grow">
-                            <div class="mb-2 flex justify-between items-start">
-                                <h3 class="text-lg font-bold text-gray-900 leading-tight">${event.name}</h3>
-                                <span class="tag ${colorClass} flex-shrink-0 ml-2">${event.category}</span>
+                    <a href="${event.sourceUrl}" target="_blank" rel="noopener noreferrer" class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col card-hover">
+                        <div class="h-44 overflow-hidden">
+                            <img src="${imageUrl}" alt="Imagen de ${event.name}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" onerror="this.src='${placeholderImage}'">
+                        </div>
+                        <div class="p-5 flex flex-col flex-grow">
+                            <span class="tag ${colorClass} self-start mb-3">${event.category}</span>
+                            <h3 class="text-lg font-bold text-gray-900 leading-tight flex-grow">${event.name}</h3>
+                            <div class="mt-4 space-y-2 text-sm text-gray-600">
+                                <p class="flex items-center"><i class="fa-solid fa-calendar-alt mr-3 w-4 text-center text-gray-400"></i>${new Date(event.date + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                                <p class="flex items-center"><i class="fa-solid fa-map-marker-alt mr-3 w-4 text-center text-gray-400"></i>${event.location || event.city}</p>
                             </div>
-                            <p class="text-sm text-gray-500 mb-2 flex items-center"><i class="fa-solid fa-map-marker-alt mr-2 text-gray-400"></i>${event.location || event.city}</p>
-                            <p class="text-sm text-gray-600 font-semibold mb-3 flex items-center"><i class="fa-solid fa-calendar-alt mr-2 text-gray-400"></i>${new Date(event.date + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                            <p class="text-sm text-gray-600 flex-grow mb-4">${event.description}</p>
-                            <div class="mt-auto pt-3 border-t border-gray-200 text-xs text-gray-400">
+                            <div class="mt-5 pt-4 border-t border-gray-200 text-xs text-gray-400">
                                Fuente: ${new URL(event.sourceUrl).hostname}
                             </div>
                         </div>
@@ -167,17 +202,22 @@
             });
         };
 
-        const todayString = new Date().toISOString().slice(0, 10);
-        const eventsCollection = collection(db, `artifacts/${appId}/public/data/events`);
-        const q = query(eventsCollection, where("date", ">=", todayString));
+        signInAnonymously(auth).then(() => {
+            const todayString = new Date().toISOString().slice(0, 10);
+            const eventsCollection = collection(db, `artifacts/${appId}/public/data/events`);
+            const q = query(eventsCollection, where("date", ">=", todayString));
 
-        onSnapshot(q, (snapshot) => {
-            loadingIndicator.classList.add('hidden');
-            allEvents = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            applyFilters();
-        }, (error) => {
-            console.error("Error al obtener eventos: ", error);
-            loadingIndicator.textContent = "Error al cargar los eventos.";
+            onSnapshot(q, (snapshot) => {
+                loadingIndicator.classList.add('hidden');
+                allEvents = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                applyFilters();
+            }, (error) => {
+                console.error("Error al obtener eventos: ", error);
+                loadingIndicator.innerHTML = '<p class="text-red-500">Error al cargar eventos. Revisa las reglas de Firestore.</p>';
+            });
+        }).catch((error) => {
+            console.error("Error de autenticación anónima:", error);
+            loadingIndicator.innerHTML = '<p class="text-red-500">Error de autenticación. La app no funcionará.</p>';
         });
 
         cityFilter.addEventListener('change', applyFilters);
@@ -190,7 +230,6 @@
             applyFilters();
         });
 
-        // Lógica del Bot IA
         const botToggleButton = document.getElementById('bot-toggle-button');
         const botModal = document.getElementById('bot-modal');
         const chatWindow = document.getElementById('chat-window');
@@ -199,7 +238,7 @@
         const addBotMessage = (message) => {
             const bubble = document.createElement('div');
             bubble.className = 'chat-bubble bot p-3 rounded-lg';
-            bubble.innerHTML = message; // Usamos innerHTML para poder formatear con negritas, etc.
+            bubble.innerHTML = message;
             chatWindow.appendChild(bubble);
             chatWindow.scrollTop = chatWindow.scrollHeight;
         };
@@ -207,52 +246,47 @@
         botToggleButton.addEventListener('click', () => {
             botModal.classList.toggle('visible');
             if(botModal.classList.contains('visible') && chatWindow.children.length === 0) {
-                 addBotMessage("¡Hola! Soy tu asesor de eventos. ¿Buscas algo entretenido para hoy? Presiona el botón de abajo y usaré la IA para recomendarte algo genial.");
+                 addBotMessage("¡Hola! 👋 Soy tu asesor de eventos. ¿Buscas un panorama para hoy? ¡Déjamelo a mí!");
             }
         });
 
         suggestEventButton.addEventListener('click', async () => {
             suggestEventButton.disabled = true;
-            suggestEventButton.textContent = "Pensando...";
+            suggestEventButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span class="ml-2">Pensando...</span>';
             
+            const todayString = new Date().toISOString().slice(0, 10);
             const eventsForToday = allEvents.filter(event => event.date === todayString);
 
             if (eventsForToday.length === 0) {
-                addBotMessage("Vaya, parece que no hay eventos programados para hoy en la base de datos. ¡Vuelve a consultar mañana!");
-                suggestEventButton.disabled = false;
-                suggestEventButton.textContent = "Búscame un evento para hoy";
-                return;
-            }
+                addBotMessage("¡Oh! Parece que hoy no hay eventos en la base de datos. ¡Pero no te preocupes! Mañana es otro día lleno de posibilidades. 😉");
+            } else {
+                const eventListForAI = eventsForToday.map(e => `- ${e.name} en ${e.city} (${e.category})`).join('\n');
+                const prompt = `De la siguiente lista de eventos para hoy, elige solo uno que creas que es el más interesante o divertido. Preséntalo de forma entusiasta y amigable, como una recomendación personal. Describe por qué es una buena idea ir. Incluye el nombre del evento en negrita. Aquí está la lista:\n\n${eventListForAI}`;
 
-            const eventListForAI = eventsForToday.map(e => `- ${e.name} en ${e.city} (${e.category})`).join('\n');
-            const prompt = `De la siguiente lista de eventos para hoy, elige solo uno que creas que es el más interesante o divertido. Preséntalo de forma entusiasta y amigable, como una recomendación personal. Describe por qué es una buena idea ir. Incluye el nombre del evento en negrita. Aquí está la lista:\n\n${eventListForAI}`;
-
-            try {
-                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
-                const payload = { contents: chatHistory };
-                const apiKey = ""; 
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-                
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await response.json();
-                
-                if (result.candidates && result.candidates.length > 0) {
-                    const text = result.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                    addBotMessage(text);
-                } else {
-                    addBotMessage("No pude decidirme, ¡todos se ven geniales! ¿Por qué no le echas un vistazo a la lista tú mismo?");
+                try {
+                    const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+                    const apiKey = ""; 
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await response.json();
+                    
+                    if (result.candidates && result.candidates.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                        addBotMessage(text);
+                    } else {
+                        addBotMessage("¡Hay tantas opciones buenas que no pude decidirme! Te recomiendo echar un vistazo a la lista principal. ¡Seguro encuentras algo genial! ✨");
+                    }
+                } catch (error) {
+                    console.error("Error con la API de IA:", error);
+                    addBotMessage("Mmm, mi cerebro de IA tuvo un cortocircuito. 🧠⚡ Inténtalo de nuevo en un momento, por favor.");
                 }
-            } catch (error) {
-                console.error("Error con la API de IA:", error);
-                addBotMessage("Tuve un problema para conectarme con mi cerebro de IA. Inténtalo de nuevo en un momento.");
-            } finally {
-                suggestEventButton.disabled = false;
-                suggestEventButton.textContent = "Búscame un evento para hoy";
             }
+            suggestEventButton.disabled = false;
+            suggestEventButton.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i><span class="ml-2">Sorpréndeme para hoy</span>';
         });
     </script>
 </body>
