@@ -68,19 +68,19 @@
         
         <div id="loading-indicator" class="text-center py-12">
             <i class="fas fa-spinner fa-spin text-4xl text-indigo-500"></i>
-            <p class="text-lg text-gray-600 mt-4">Contactando a nuestro motor de búsqueda... Esto puede tardar un momento.</p>
+            <p class="text-lg text-gray-600 mt-4">Pidiendo la lista de eventos a nuestra bodega...</p>
         </div>
         <div id="no-events-message" class="hidden text-center py-16 px-6 bg-white rounded-xl shadow-lg">
             <img src="https://placehold.co/128x128/e0e7ff/6366f1?text=🤔" alt="Ícono de búsqueda" class="mx-auto rounded-full">
             <p class="text-2xl font-bold text-gray-800 mt-6">¡Ups! No encontramos panoramas</p>
-            <p class="text-gray-500 mt-2 max-w-md mx-auto">Prueba con otros filtros o palabras clave. Nuestro motor busca constantemente, ¡vuelve a intentarlo!</p>
+            <p class="text-gray-500 mt-2 max-w-md mx-auto">Prueba con otros filtros o palabras clave. Nuestro motor busca nuevos eventos cada hora.</p>
         </div>
     </div>
 
     <script type="module">
         // --- CONFIGURACIÓN ---
         // !! IMPORTANTE: REEMPLAZA ESTA URL EN EL PASO 4 DE LA GUÍA !!
-        const API_URL = "https://TU-PROYECTO.glitch.me/events"; 
+        const API_URL = "https://TU-PROYECTO.onrender.com/events"; 
         
         let allEvents = [];
         const eventsContainer = document.getElementById('events-container');
